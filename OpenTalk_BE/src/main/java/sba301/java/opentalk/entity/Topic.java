@@ -23,6 +23,9 @@ public class Topic extends BaseEntity {
     @Column
     private String remark;
 
+    @Column
+    private String imageDescription;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_suggest_id")
     private User suggestBy;
