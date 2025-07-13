@@ -106,9 +106,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDTO> getUserByUsername(String username) {
-        log.info("Start HQL query");
         userRepository.findByUsername(username);
-        log.info("End HQL query");
         return userRepository.findByUsername(username)
                 .map(UserMapper.INSTANCE::userToUserDTO);
     }
