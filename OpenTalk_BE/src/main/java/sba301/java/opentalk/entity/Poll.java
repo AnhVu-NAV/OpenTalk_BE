@@ -16,4 +16,7 @@ public class Poll extends BaseEntity{
     @JoinColumn(name = "opentalk_meeting_id")
     private OpenTalkMeeting openTalkMeeting;
 
+    @Column
+    private boolean isEnabled;
+
 }
