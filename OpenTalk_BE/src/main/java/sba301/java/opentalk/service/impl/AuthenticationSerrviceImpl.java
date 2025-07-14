@@ -45,8 +45,10 @@ public class AuthenticationSerrviceImpl implements AuthenticationService {
         newUser.setUsername(request.getUsername());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setEmail(request.getEmail());
-        CompanyBranch companyBranch = companyBranchService.findById(request.getCompanyBranchId()).orElse(null);
-        newUser.setCompanyBranch(companyBranch);
+        if (request.getCompanyBranchId() != null) {
+            CompanyBranch companyBranch = companyBranchService.findById(request.getCompanyBranchId()).orElse(null);
+            newUser.setCompanyBranch(companyBranch);
+        }
         newUser.setCreatedAt(LocalDateTime.now());
         newUser.setUpdatedAt(LocalDateTime.now());
         newUser.setIsEnabled(true);
