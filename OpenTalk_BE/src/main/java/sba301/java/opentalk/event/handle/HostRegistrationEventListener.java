@@ -35,12 +35,12 @@ public class HostRegistrationEventListener {
         if (event.getStatus().equals(HostRegistrationStatus.APPROVED)) {
             mail.setMailSubject(messageSource.getMessage("mail.subject.registration.approved", null, locale));
             mail.setMailContent(messageSource.getMessage("mail.content.registration.approved",
-                    new Object[]{user.getFullName(), meeting.getTopicName(), meeting.getScheduledDate()}, locale));
+                    new Object[]{user.getFullName(), meeting.getMeetingName(), meeting.getScheduledDate()}, locale));
             mail.setMailTo(new String[]{user.getEmail()});
         } else if (event.getStatus().equals(HostRegistrationStatus.REJECTED)) {
             mail.setMailSubject(messageSource.getMessage("mail.subject.registration.rejected", null, locale));
             mail.setMailContent(messageSource.getMessage("mail.content.registration.rejected",
-                    new Object[]{user.getFullName(), meeting.getTopicName(), meeting.getScheduledDate()}, locale));
+                    new Object[]{user.getFullName(), meeting.getMeetingName(), meeting.getScheduledDate()}, locale));
             mail.setMailTo(new String[]{user.getEmail()});
         } else {
             mail.setMailSubject("Host Meeting Registration Announcement");
@@ -48,7 +48,7 @@ public class HostRegistrationEventListener {
             mail.setMailTo(admins.stream()
                     .map(UserDTO::getEmail)
                     .toArray(String[]::new));
-            mail.setMailContent("Please check " + meeting.getTopicName() + " - ID: " + meeting.getId() +
+            mail.setMailContent("Please check " + meeting.getMeetingName() + " - ID: " + meeting.getId() +
                     "to confirm request to be Host of " + user.getFullName() + " -ID: " + user.getId());
         }
         mailService.sendMail(mail);

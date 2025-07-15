@@ -5,6 +5,7 @@ import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public interface OpenTalkMeetingService {
 
     boolean deleteMeeting(Long topicId);
 
-    boolean checkExistOpenTalk(LocalDate date);
+    boolean checkExistOpenTalk(LocalDateTime dateTime);
 
     void createScheduledOpenTalk();
 

@@ -13,18 +13,20 @@ import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.enums.MailType;
+import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
+import sba301.java.opentalk.service.HostRegistrationService;
 import sba301.java.opentalk.service.MailService;
 import sba301.java.opentalk.service.OpenTalkMeetingService;
-import sba301.java.opentalk.service.HostRegistrationService;
 import sba301.java.opentalk.service.RedisService;
 import sba301.java.opentalk.service.UserService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -97,8 +99,8 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     }
 
     @Override
-    public boolean checkExistOpenTalk(LocalDate date) {
-        return meetingRepository.findByScheduledDate(date).isPresent();
+    public boolean checkExistOpenTalk(LocalDateTime dateTime) {
+        return meetingRepository.findByScheduledDate(dateTime).isPresent();
     }
 
     @Override
@@ -111,14 +113,14 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
 
         UserDTO randomUser = availableUsers.get((int) (randomOpenTalkNumberGenerator.generateOpenTalkNumber() * availableUsers.size()));
 
-        LocalDate scheduledDate = LocalDate.now().plusDays(redisService.getDaysUntilOpenTalk());
+        LocalDateTime scheduledDate = LocalDateTime.now().plusDays(redisService.getDaysUntilOpenTalk());
         if (checkExistOpenTalk(scheduledDate)) {
             return;
         }
 
         OpenTalkMeetingDTO newTopic = new OpenTalkMeetingDTO();
-        newTopic.setTopicName("");
-        newTopic.setEnabled(true);
+        newTopic.setMeetingName("");
+        newTopic.setStatus(MeetingStatus.WAITING_TOPIC);
         newTopic.setScheduledDate(scheduledDate);
         newTopic.setCompanyBranch(randomUser.getCompanyBranch());
         createMeeting(newTopic);
@@ -137,7 +139,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         Mail mail = new Mail();
         mail.setMailTo(allUsers.stream().map(UserDTO::getEmail).toArray(String[]::new));
         mail.setMailSubject(MailSubjectFactory.getMailSubject(MailType.REMIND).toString());
-        mail.setMailContent("Remind invite the Open Talk Topic " + getMeetingById(openTalkId).get().getTopicName());
+        mail.setMailContent("Remind invite the Open Talk Topic " + getMeetingById(openTalkId).get().getMeetingName());
         mailService.sendMail(mail);
-    }    
+    }
 }

@@ -1,6 +1,9 @@
 package sba301.java.opentalk.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
@@ -12,6 +15,6 @@ public class TopicDTO extends BaseDTO {
     private String description;
     private String status;
     private String remark;
-    private long suggestBy;   // toàn bộ User gợi ý
-    private long evaluteBy;   // người duyệt
+    private UserDTO suggestedBy;
+    private UserDTO evalutedBy;
 }
