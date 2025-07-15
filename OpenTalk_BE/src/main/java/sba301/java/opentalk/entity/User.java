@@ -37,6 +37,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = true;
 
+    @Column
+    private String avatarUrl;
+
     public User(long id) {
         this.setId(id);
     }
