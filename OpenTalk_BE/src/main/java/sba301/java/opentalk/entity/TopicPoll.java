@@ -16,7 +16,7 @@ import java.util.List;
 public class TopicPoll extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "poll_id")
-    private Poll Poll;
+    private Poll poll;
 
     @ManyToOne
     @JoinColumn(name = "topic_id")
