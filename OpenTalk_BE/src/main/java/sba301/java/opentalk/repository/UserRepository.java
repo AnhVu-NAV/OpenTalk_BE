@@ -28,8 +28,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "AND (:employeeName IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :employeeName, '%'))) " +
             "AND (:isEnabled IS NULL OR u.isEnabled = :isEnabled) " +
             "AND NOT EXISTS ( " +
-            "    SELECT 1 FROM OpenTalkRegistration r " +
-            "    JOIN r.openTalkTopic o " +
+            "    SELECT 1 FROM HostRegistration r " +
+            "    JOIN r.openTalkMeeting o " +
             "    WHERE r.user.id = u.id " +
             "    AND (:startDate IS NULL OR o.scheduledDate >= :startDate) " +
             "    AND (:endDate IS NULL OR o.scheduledDate <= :endDate) " +

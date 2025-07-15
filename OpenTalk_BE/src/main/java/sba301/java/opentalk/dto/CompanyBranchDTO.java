@@ -7,8 +7,4 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class CompanyBranchDTO extends BaseDTO {
     private String name;
-
-    private int identify(int cardNumber) {
-        return cardNumber;
-    }
 }

@@ -22,8 +22,8 @@ public class OpenTalkSlide extends BaseEntity {
     private User uploadedBy;
 
     @ManyToOne
-    @JoinColumn(name = "opentalk_topic_id")
-    private OpenTalkTopic openTalkTopic;
+    @JoinColumn(name = "meeting_id")
+    private OpenTalkMeeting meeting;
 
     public OpenTalkSlide(long id) {
         this.setId(id);

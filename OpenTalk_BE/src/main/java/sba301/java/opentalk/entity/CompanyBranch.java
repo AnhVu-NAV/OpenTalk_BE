@@ -23,7 +23,7 @@ public class CompanyBranch extends BaseEntity {
     private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "companyBranch")
-    private List<OpenTalkTopic> topics;
+    private List<OpenTalkMeeting> meetings;
 
     public CompanyBranch(long id) {
         this.setId(id);
