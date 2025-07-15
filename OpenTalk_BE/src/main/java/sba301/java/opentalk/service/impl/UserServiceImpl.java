@@ -3,6 +3,8 @@ package sba301.java.opentalk.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final CompanyBranchRepository companyBranchRepository;
+//    private final UserMapper userMapper;
 
     @Override
     public UserDTO createUser(User user) {
@@ -162,4 +165,32 @@ public class UserServiceImpl implements UserService {
     public void generateRandom() {
         System.out.println((int) randomOpenTalkNumberGenerator.generateOpenTalkNumber() * 100);
     }
+
+    @Override
+    public Page<UserDTO> findEmployees(String search, Pageable pageable) {
+        Page<User> users;
+        if (search == null || search.isBlank()) {
+            users = userRepository.findAll(pageable);
+        } else {
+            users = userRepository.searchByNameOrEmail(search.toLowerCase(), pageable);
+        }
+        return users.map(UserMapper.INSTANCE::userToUserDTO);
+    }
+
+    @Override
+    public UserDTO createUser(UserDTO userDTO) {
+        // Mặc định role = 2 (USER)
+        Optional<Role> role = roleRepository.findById(2L);
+        if (role.isEmpty()) {
+            throw new RuntimeException("Role not found");
+        }
+
+        userDTO.setRole(role.get().getId()); // 👈 Đúng kiểu: Long
+
+        User userEntity = UserMapper.INSTANCE.userDTOToUser(userDTO);
+        User saved = userRepository.save(userEntity);
+
+        return UserMapper.INSTANCE.userToUserDTO(saved);
+    }
+
 }

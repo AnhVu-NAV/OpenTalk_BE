@@ -1,5 +1,7 @@
 package sba301.java.opentalk.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.exception.AppException;
@@ -33,4 +35,8 @@ public interface UserService {
     List<UserDTO> getAvailableUsersTobeHost();
 
     public void generateRandom();
+
+    Page<UserDTO> findEmployees(String search, Pageable pageable);
+
+    UserDTO createUser(UserDTO dto);
 }
