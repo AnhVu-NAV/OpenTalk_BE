@@ -2,8 +2,10 @@ package sba301.java.opentalk.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import sba301.java.opentalk.enums.MeetingStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "opentalk_meeting")
@@ -17,13 +19,14 @@ public class OpenTalkMeeting extends BaseEntity {
     private String meetingName;
 
     @Column(name = "scheduled_date", nullable = false)
-    private LocalDate scheduledDate;
+    private LocalDateTime scheduledDate;
 
     @Column(name = "meeting_link", length = 255)
     private String meetingLink;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 50)
+    private MeetingStatus status;
 
     @OneToOne
     @JoinColumn(name = "topic_id")

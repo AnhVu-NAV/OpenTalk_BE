@@ -95,22 +95,7 @@ public class OpenTalkMeetingController {
         return openTalkMeetingService.deleteMeeting(openTalkMeetingId) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/register/{openTalkMeetingId}")
-    public ResponseEntity<List<HostRegistrationDTO>> getRegisteredOpenTalks(@PathVariable Long openTalkMeetingId) {
-        return ResponseEntity.ok().body(hostRegistrationService.findByOpenTalkMeetingId(openTalkMeetingId));
-    }
-
-    @GetMapping("/register/native-query/{openTalkMeetingId}")
-    public ResponseEntity<List<HostRegistrationDTO>> getRegisteredOpenTalksWithNativeQuery(@PathVariable Long openTalkMeetingId) {
-        return ResponseEntity.ok().body(hostRegistrationService.findByOpenTalkMeetingIdWithNativeQuery(openTalkMeetingId));
-    }
-
-    @GetMapping("/register/interface-projection/{openTalkMeetingId}")
-    public ResponseEntity<List<HostRegistrationDTO>> getRegisteredOpenTalksWithInterfaceProjection(@PathVariable Long openTalkMeetingId) {
-        return ResponseEntity.ok().body(hostRegistrationService.findByOpenTalkMeetingIdWithInterfaceProjection(openTalkMeetingId));
-    }
-
-    @GetMapping("mail/remind/{openTalkMeetingId}")
+    @GetMapping("/mail/remind/{openTalkMeetingId}")
     public ResponseEntity<String> sendRemindEmail(@PathVariable Long openTalkMeetingId) {
         openTalkMeetingService.sendMailRemind(openTalkMeetingId);
         return ResponseEntity.ok().build();

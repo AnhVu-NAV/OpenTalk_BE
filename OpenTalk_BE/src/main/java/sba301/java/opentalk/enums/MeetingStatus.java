@@ -1,0 +1,5 @@
+package sba301.java.opentalk.enums;
+
+public enum MeetingStatus {
+    WAITING_TOPIC, WAITING_HOST_REGISTER, WAITING_HOST_SELECTION, UPCOMING, ONGOING, COMPLETED, CANCELLED, POSTPONED
+}
