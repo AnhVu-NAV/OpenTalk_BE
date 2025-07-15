@@ -21,7 +21,7 @@ public interface CompanyBranchService {
 
     boolean deleteCompanyBranch(Long companyBranchId);
 
-    public List<BranchEmployeeCountDTO> getAllBranchesWithEmployeeCount();
+    List<BranchEmployeeCountDTO> getAllBranchesWithEmployeeCount();
 
-    public void notifyAllEmployee(List<User> users);
+    void notifyAllEmployee(List<User> users);
 }

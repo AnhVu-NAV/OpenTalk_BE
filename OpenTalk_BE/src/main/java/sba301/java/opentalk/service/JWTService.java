@@ -8,6 +8,6 @@ public interface JWTService {
     String generateAcessToken(UserDTO dto);
     String generateRefreshToken(UserDTO dto);
     String extractUsername(String token);
-    public Date extractExpiration(String token);
+    Date extractExpiration(String token);
     long extractUserId(String token);
 }
