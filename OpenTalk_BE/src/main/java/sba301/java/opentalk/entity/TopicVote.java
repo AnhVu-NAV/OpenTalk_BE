@@ -1,10 +1,9 @@
 package sba301.java.opentalk.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "topic_vote")
@@ -14,11 +13,11 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode(callSuper = true)
 public class TopicVote extends BaseEntity{
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User voter;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "topic_poll_id")
     private TopicPoll topicPoll;
 }
