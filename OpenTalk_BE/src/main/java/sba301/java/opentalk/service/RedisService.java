@@ -3,20 +3,20 @@ package sba301.java.opentalk.service;
 import java.util.concurrent.TimeUnit;
 
 public interface RedisService {
-    public void saveRefreshToken(long userId, String refreshToken, long duration);
-    public String getRefreshToken(long userId);
-    public void deleteRefreshToken(long userId);
-    public boolean isRefreshTokenExpired(long userId);
+    void saveRefreshToken(long userId, String refreshToken, long duration);
+    String getRefreshToken(long userId);
+    void deleteRefreshToken(long userId);
+    boolean isRefreshTokenExpired(long userId);
 
-    public void saveRandomDateCron(String cronExpression);
-    public String getRandomDateCron();
+    void saveRandomDateCron(String cronExpression);
+    String getRandomDateCron();
 
-    public void saveDaysUntilOpenTalk(int daysUntilOpenTalk);
-    public int getDaysUntilOpenTalk();
+    void saveDaysUntilOpenTalk(int daysUntilOpenTalk);
+    int getDaysUntilOpenTalk();
 
-    public void saveSyncDateCron(String cronExpression);
-    public String getSyncDateCron();
+    void saveSyncDateCron(String cronExpression);
+    String getSyncDateCron();
 
-    public void revokeToken(String accessToken, long ttl);
-    public boolean isTokenRevoked(String accessToken);
+    void revokeToken(String accessToken, long ttl);
+    boolean isTokenRevoked(String accessToken);
 }

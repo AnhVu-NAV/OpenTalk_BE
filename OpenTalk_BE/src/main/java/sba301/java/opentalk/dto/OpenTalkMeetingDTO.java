@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper=true)
 public class OpenTalkMeetingDTO extends BaseDTO {
     private String topicName;
-    private long companyBranch;
+    private CompanyBranchDTO companyBranch;
     private LocalDate scheduledDate;
     private String meetingLink;
     private boolean isEnabled;
