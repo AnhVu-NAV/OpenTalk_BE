@@ -8,20 +8,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
-import sba301.java.opentalk.dto.OpenTalkRegistrationDTO;
+import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.enums.MailType;
-import sba301.java.opentalk.enums.OpenTalkRegistrationStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
-import sba301.java.opentalk.mapper.OpenTalkTopicMapper;
 import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.service.MailService;
 import sba301.java.opentalk.service.OpenTalkMeetingService;
-import sba301.java.opentalk.service.OpenTalkRegistrationService;
+import sba301.java.opentalk.service.HostRegistrationService;
 import sba301.java.opentalk.service.RedisService;
 import sba301.java.opentalk.service.UserService;
 
@@ -38,7 +37,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     private final OpenTalkMeetingRepository openTalkMeetingRepository;
     private final RedisService redisService;
     private final UserService userService;
-    private final OpenTalkRegistrationService registrationService;
+    private final HostRegistrationService hostRegistrationService;
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final MailService mailService;
 
@@ -124,11 +123,11 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         newTopic.setCompanyBranch(randomUser.getCompanyBranch());
         createMeeting(newTopic);
 
-        OpenTalkRegistrationDTO registrationDTO = new OpenTalkRegistrationDTO();
-        registrationDTO.setUserId(randomUser.getId());
-        registrationDTO.setOpenTalkTopicId(Objects.requireNonNull(meetingRepository.findByScheduledDate(scheduledDate).orElse(null)).getId());
-        registrationDTO.setStatus(OpenTalkRegistrationStatus.APPROVED);
-        registrationService.registerOpenTalk(registrationDTO);
+        HostRegistrationDTO hostRegistrationDTO = new HostRegistrationDTO();
+        hostRegistrationDTO.setUserId(randomUser.getId());
+        hostRegistrationDTO.setOpenTalkMeetingId(Objects.requireNonNull(meetingRepository.findByScheduledDate(scheduledDate).orElse(null)).getId());
+        hostRegistrationDTO.setStatus(HostRegistrationStatus.APPROVED);
+        hostRegistrationService.registerOpenTalk(hostRegistrationDTO);
     }
 
     @Override

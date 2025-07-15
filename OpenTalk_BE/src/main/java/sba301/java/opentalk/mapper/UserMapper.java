@@ -1,6 +1,7 @@
 package sba301.java.opentalk.mapper;
 
 import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.entity.Role;
 import sba301.java.opentalk.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,7 +11,14 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(source = "user.companyBranch.id", target = "companyBranch")
     @Mapping(source = "user.role.id", target = "role")
     UserDTO userToUserDTO(User user);
+
+    @Mapping(source = "role", target = "role")
+    User userDTOToUser(UserDTO dto);
+
+    default Role map(Long id) {
+        if (id == null) return null;
+        return new Role(id);
+    }
 }

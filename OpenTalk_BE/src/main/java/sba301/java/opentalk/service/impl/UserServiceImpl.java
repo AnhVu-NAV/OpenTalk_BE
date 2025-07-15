@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
                 existingUser.setIsEnabled(dto.getIsEnabled());
             }
             if (dto.getCompanyBranch() != null) {
-                companyBranch = companyBranchRepository.findById(dto.getCompanyBranch()).get();
+                companyBranch = companyBranchRepository.findById(dto.getCompanyBranch().getId()).get();
                 existingUser.setCompanyBranch(companyBranch);
             }
             if (dto.getUpdatedAt() != null) {

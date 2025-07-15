@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(callSuper = true)
-public class FeedBack extends BaseEntity {
+public class Feedback extends BaseEntity {
     @Column(nullable = false)
     private Integer rate;
 
@@ -22,6 +22,6 @@ public class FeedBack extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "opentalk_meeting_id", nullable = false)
-    private OpenTalkMeeting openTalkMeeting;
+    @JoinColumn(name = "meeting_id", nullable = false)
+    private OpenTalkMeeting meeting;
 }
