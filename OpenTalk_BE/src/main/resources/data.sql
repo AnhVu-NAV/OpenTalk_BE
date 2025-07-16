@@ -8,7 +8,7 @@ VALUES
     ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Đà Nẵng'),
     ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh TP. HCM');
 
-INSERT INTO opental_meeting
+INSERT INTO opentalk_meeting
 (created_at, updated_at, meeting_link,      meeting_name,        scheduled_date, status,  company_branch_id, topic_id)
 VALUES
     ('2025-07-14 21:12:43','2025-07-14 21:12:43','https://zoom.us/j/100000001','Opentalk Meeting 1','2025-07-20','pending',1, NULL),

@@ -14,4 +14,5 @@ public class OpenTalkMeetingDTO extends BaseDTO {
     private String meetingLink;
     private MeetingStatus status;
     private CompanyBranchDTO companyBranch;
+    private TopicDTO topic;
 }

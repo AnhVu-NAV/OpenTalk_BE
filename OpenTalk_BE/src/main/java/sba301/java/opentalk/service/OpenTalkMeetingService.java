@@ -29,4 +29,7 @@ public interface OpenTalkMeetingService {
     void createScheduledOpenTalk();
 
     void sendMailRemind(Long openTalkId);
+
+    OpenTalkMeetingDTO findMeetingById(long meetingId);
+
 }

@@ -43,6 +43,15 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/company-branch/**")
                         .hasRole("ADMIN")
 
+                        .requestMatchers("/api/topic-idea/**")
+                        .hasRole("USER")
+
+                        .requestMatchers("/api/opentalk-meeting/**")
+                        .hasRole("USER").
+
+                        requestMatchers("/api/topic-poll/**")
+                        .hasRole("USER")
+
                         .requestMatchers(
                                 "/api/users",
                                 "/api/opentalk-topic",
