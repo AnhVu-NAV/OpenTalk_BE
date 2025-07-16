@@ -4,7 +4,7 @@ import lombok.*;
 
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 public class TopicDTO extends BaseDTO {
     private String title;
     private String description;

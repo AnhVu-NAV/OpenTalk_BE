@@ -1,5 +1,6 @@
 package sba301.java.opentalk.repository;
 
+import org.springframework.data.domain.Page;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.serverHrm.model.UserFromHRM;
 import org.springframework.data.domain.Pageable;
@@ -55,4 +56,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "company_branch_id AS companyBranch " +
             "FROM user", nativeQuery = true)
     List<UserFromHRM> findAllUsersFormHRM();
+
+    @Query("SELECT u FROM User u WHERE LOWER(u.fullName) LIKE %:search% OR LOWER(u.email) LIKE %:search%")
+    Page<User> searchByNameOrEmail(@Param("search") String search, Pageable pageable);
+
 }
