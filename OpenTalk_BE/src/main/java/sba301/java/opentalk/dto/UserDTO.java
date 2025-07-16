@@ -15,4 +15,5 @@ public class UserDTO extends BaseDTO implements Serializable {
     private Boolean isEnabled;
     private CompanyBranchDTO companyBranch;
     private Long role;
+    private String avatarUrl;
 }
