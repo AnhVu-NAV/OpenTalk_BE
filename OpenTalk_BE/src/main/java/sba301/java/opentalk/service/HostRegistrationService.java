@@ -6,7 +6,12 @@ import java.util.List;
 
 public interface HostRegistrationService {
     void registerOpenTalk(HostRegistrationDTO registrationDTO);
+
     List<HostRegistrationDTO> findByOpenTalkMeetingId(Long topicId);
+
     List<HostRegistrationDTO> findByOpenTalkMeetingIdWithNativeQuery(Long topicId);
+
     List<HostRegistrationDTO> findByOpenTalkMeetingIdWithInterfaceProjection(Long topicId);
+
+    HostRegistrationDTO findRandomHost(Long topicId);
 }
