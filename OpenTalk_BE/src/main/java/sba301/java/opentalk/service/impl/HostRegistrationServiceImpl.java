@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import sba301.java.opentalk.dto.IHostRegistration;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
+import sba301.java.opentalk.dto.IHostRegistration;
 import sba301.java.opentalk.entity.HostRegistration;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.User;
@@ -83,5 +83,10 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public HostRegistrationDTO findRandomHost(Long topicId) {
+        return null;
     }
 }

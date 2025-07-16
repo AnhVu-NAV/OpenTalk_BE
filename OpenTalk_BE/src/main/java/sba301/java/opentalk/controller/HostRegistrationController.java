@@ -33,4 +33,9 @@ public class HostRegistrationController {
     public ResponseEntity<List<HostRegistrationDTO>> getRegisteredOpenTalksWithInterfaceProjection(@PathVariable Long openTalkMeetingId) {
         return ResponseEntity.ok().body(hostRegistrationService.findByOpenTalkMeetingIdWithInterfaceProjection(openTalkMeetingId));
     }
+
+    @GetMapping("/auto-select-host/{openTalkMeetingId}")
+    public ResponseEntity<List<HostRegistrationDTO>> getRandomHost(@PathVariable Long openTalkMeetingId) {
+        return ResponseEntity.ok().body(hostRegistrationService.findByOpenTalkMeetingIdWithInterfaceProjection(openTalkMeetingId));
+    }
 }
