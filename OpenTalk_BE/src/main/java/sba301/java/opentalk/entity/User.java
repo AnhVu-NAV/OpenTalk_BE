@@ -50,7 +50,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
+        return List.of(new SimpleGrantedAuthority(role.getName().toUpperCase()));
     }
 
     @Override
