@@ -8,18 +8,24 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.IHostRegistration;
+import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.HostRegistration;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.event.HostRegistrationEvent;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.UserMapper;
+import sba301.java.opentalk.model.UserHostCount;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.repository.UserRepository;
 import sba301.java.opentalk.service.HostRegistrationService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,18 +35,18 @@ import java.util.stream.Collectors;
 public class HostRegistrationServiceImpl implements HostRegistrationService {
     private final HostRegistrationRepository hostRegistrationRepository;
     private final UserRepository userRepository;
-    private final OpenTalkMeetingRepository topicRepository;
+    private final OpenTalkMeetingRepository meetingRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void registerOpenTalk(HostRegistrationDTO registrationDTO) {
-        User user = userRepository.findById(registrationDTO.getUserId())
+        User user = userRepository.findById(registrationDTO.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User Not Found"));
 
-        OpenTalkMeeting topic = topicRepository.findById(registrationDTO.getOpenTalkMeetingId())
+        OpenTalkMeeting topic = meetingRepository.findById(registrationDTO.getMeeting().getId())
                 .orElseThrow(() -> new RuntimeException("Topic Not Found"));
 
-        if (hostRegistrationRepository.existsByUserIdAndOpenTalkMeetingId(registrationDTO.getUserId(), registrationDTO.getOpenTalkMeetingId())) {
+        if (hostRegistrationRepository.existsByUserIdAndOpenTalkMeetingId(registrationDTO.getUser().getId(), registrationDTO.getMeeting().getId())) {
             throw new RuntimeException("User has registered this OpenTalk Topic");
         }
 
@@ -77,8 +83,8 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
                     dto.setId(registration.getId());
                     dto.setCreatedAt(registration.getCreatedAt());
                     dto.setUpdatedAt(registration.getUpdatedAt());
-                    dto.setUserId(registration.getUserId());
-                    dto.setOpenTalkMeetingId(registration.getOpenTalkMeetingId());
+                    dto.setUser(UserMapper.INSTANCE.userToUserDTO(userRepository.findById(registration.getUserId()).get()));
+                    dto.setMeeting(OpenTalkMeetingMapper.INSTANCE.toDto(meetingRepository.findById(registration.getOpenTalkMeetingId()).get()));
                     dto.setStatus(registration.getStatus());
                     return dto;
                 })
@@ -86,7 +92,32 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
     }
 
     @Override
-    public HostRegistrationDTO findRandomHost(Long topicId) {
-        return null;
+    public UserDTO findRandomHost(Long meetingId) {
+        OpenTalkMeeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new IllegalArgumentException("Meeting not found"));
+
+        LocalDateTime startOfYear = LocalDateTime.of(LocalDate.now().getYear(), 1, 1, 0, 0);
+        LocalDateTime now = LocalDateTime.now();
+        List<UserHostCount> results = userRepository.findAllUsersWithApprovedHostCount(
+                startOfYear, now, meeting.getCompanyBranch().getId());
+
+        if (results.isEmpty()) {
+            throw new IllegalStateException("No available users found");
+        }
+
+        Long minCount = results.get(0).getCount();
+        List<User> leastHostedUsers = results.stream()
+                .filter(r -> r.getCount().equals(minCount))
+                .map(UserHostCount::getUser)
+                .toList();
+        User selected = leastHostedUsers.get(new Random().nextInt(leastHostedUsers.size()));
+
+        HostRegistration registration = new HostRegistration();
+        registration.setUser(selected);
+        registration.setOpenTalkMeeting(meeting);
+        registration.setStatus(HostRegistrationStatus.APPROVED);
+        hostRegistrationRepository.save(registration);
+
+        return UserMapper.INSTANCE.userToUserDTO(selected);
     }
 }

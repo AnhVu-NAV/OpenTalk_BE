@@ -28,7 +28,6 @@ import sba301.java.opentalk.service.UserService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -126,8 +125,8 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         createMeeting(newTopic);
 
         HostRegistrationDTO hostRegistrationDTO = new HostRegistrationDTO();
-        hostRegistrationDTO.setUserId(randomUser.getId());
-        hostRegistrationDTO.setOpenTalkMeetingId(Objects.requireNonNull(meetingRepository.findByScheduledDate(scheduledDate).orElse(null)).getId());
+        hostRegistrationDTO.setUser(randomUser);
+        hostRegistrationDTO.setMeeting(OpenTalkMeetingMapper.INSTANCE.toDto(meetingRepository.findByScheduledDate(scheduledDate).get()));
         hostRegistrationDTO.setStatus(HostRegistrationStatus.APPROVED);
         hostRegistrationService.registerOpenTalk(hostRegistrationDTO);
     }

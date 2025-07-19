@@ -7,7 +7,7 @@ import sba301.java.opentalk.enums.HostRegistrationStatus;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class HostRegistrationDTO extends BaseDTO {
-    private long userId;
-    private long openTalkMeetingId;
+    private UserDTO user;
+    private OpenTalkMeetingDTO meeting;
     private HostRegistrationStatus status;
 }
