@@ -1,5 +1,7 @@
 package sba301.java.opentalk.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import sba301.java.opentalk.dto.TopicDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.User;
@@ -13,6 +15,7 @@ public interface TopicService {
     public TopicDTO addTopic(TopicDTO topic);
     public TopicDTO updateTopic(TopicDTO topic);
     public TopicDTO deleteTopic(long id);
-    public List<TopicDTO> getTopics(int pageNo, int pageSize, String status);
     public List<TopicDTO> getTopicsByUser(long userId);
+    Page<TopicDTO> findByStatusAndTitle(String status, Pageable pageable, String title);
+
 }

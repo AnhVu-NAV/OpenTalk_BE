@@ -145,6 +145,11 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
 
     @Override
     public OpenTalkMeetingDTO findMeetingById(long meetingId) {
-        return openTalkMeetingRepository.findById(meetingId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+        return openTalkMeetingRepository.findByTopicId(meetingId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+    }
+
+    @Override
+    public OpenTalkMeetingDTO findMeetingByTopicId(long topicId) {
+        return openTalkMeetingRepository.findByTopicId(topicId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
     }
 }

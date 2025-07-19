@@ -111,4 +111,10 @@ public class OpenTalkMeetingController {
     public OpenTalkMeetingDTO getMeetingByID(@PathVariable Long openTalkMeetingId) {
         return openTalkMeetingService.findMeetingById(openTalkMeetingId);
     }
+
+    @GetMapping("/meeting/{topicId}")
+    public ResponseEntity<OpenTalkMeetingDTO> getMeetingByTopic(@PathVariable Long topicId) {
+        OpenTalkMeetingDTO openTalkMeetingDTO = openTalkMeetingService.findMeetingByTopicId(topicId);
+        return ResponseEntity.ok(openTalkMeetingDTO);
+    }
 }

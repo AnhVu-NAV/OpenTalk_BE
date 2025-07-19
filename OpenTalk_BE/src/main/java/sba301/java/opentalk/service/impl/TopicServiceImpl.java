@@ -59,18 +59,6 @@ public class TopicServiceImpl implements TopicService {
         return TopicMapper.INSTANCE.toDto(topicRepository.findById(id).get());
     }
 
-    @Override
-    public List<TopicDTO> getTopics(int pageNo, int pageSize, String status) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Topic> page = topicRepository.findByStatus(status, pageable);
-        List<TopicDTO> topicDTOS = new ArrayList<>();
-        if (page.hasContent()) {
-            for(Topic topic : page.getContent()) {
-                topicDTOS.add(TopicMapper.INSTANCE.toDto(topic));
-            }
-        }
-        return topicDTOS;
-    }
 
     @Override
     public List<TopicDTO> getTopicsByUser(long userId) {
@@ -82,4 +70,12 @@ public class TopicServiceImpl implements TopicService {
         }
         return listTopic;
     }
+
+    @Override
+    public Page<TopicDTO> findByStatusAndTitle(String status, Pageable pageable, String title) {
+        Page<Topic> topicPage = topicRepository.findByStatusAndTitle(status, pageable, title);
+        return topicPage.map(TopicMapper.INSTANCE::toDto);
+    }
+
+
 }

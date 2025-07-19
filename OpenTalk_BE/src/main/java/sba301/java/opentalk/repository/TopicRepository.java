@@ -12,8 +12,8 @@ import java.util.List;
 
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long> {
-    @Query("SELECT t FROM Topic t WHERE t.status LIKE %?1%")
-    Page<Topic> findByStatus(String title, Pageable pageable);
+    @Query("SELECT t FROM Topic t WHERE t.status LIKE %?1% and t.title LIKE %?2%")
+    Page<Topic> findByStatusAndTitle(String status, Pageable pageable, String title);
 
     List<Topic> findBySuggestedBy(User user);
 }
