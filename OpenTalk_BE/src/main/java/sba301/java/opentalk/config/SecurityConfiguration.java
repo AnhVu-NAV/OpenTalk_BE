@@ -1,7 +1,6 @@
 package sba301.java.opentalk.config;
 
 import lombok.RequiredArgsConstructor;
-import sba301.java.opentalk.security.AuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +11,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sba301.java.opentalk.security.AuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -58,6 +58,15 @@ public class SecurityConfiguration {
                         .hasRole("USER").
 
                         requestMatchers("/api/topic-poll/**")
+                        .hasRole("USER")
+
+                        .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/attendance/checkin")
+                        .hasRole("USER")
+
+                        .requestMatchers(HttpMethod.GET, "/api/attendance/checkin-status")
                         .hasRole("USER")
 
                         .requestMatchers(

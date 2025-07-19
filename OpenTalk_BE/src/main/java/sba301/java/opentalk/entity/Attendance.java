@@ -1,10 +1,20 @@
 package sba301.java.opentalk.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "attendance")
+@Table(name = "attendance",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "opentalk_meeting_id"})
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

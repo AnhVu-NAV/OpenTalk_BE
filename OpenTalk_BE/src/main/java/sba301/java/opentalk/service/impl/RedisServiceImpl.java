@@ -1,10 +1,11 @@
 package sba301.java.opentalk.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import sba301.java.opentalk.service.RedisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import sba301.java.opentalk.service.RedisService;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -14,7 +15,12 @@ public class RedisServiceImpl implements RedisService {
 
     private static final String CRON_KEY_DAYS_UNTIL_OPENTALK = "cron:daysUntilOpenTalk";
     private static final String CRON_KEY_RANDOM = "cron:random";
-    private static final String CRON_KEY_SYNC= "cron:sync";
+    private static final String CRON_KEY_SYNC = "cron:sync";
+
+    @Override
+    public String get(String key) {
+        return (String) redisTemplate.opsForValue().get(key);
+    }
 
     @Override
     public void saveRefreshToken(long userId, String refreshToken, long duration) {
@@ -88,5 +94,10 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void savePollScheduleCron(long pollId, String cronExpression) {
         redisTemplate.opsForValue().set(String.valueOf(pollId), cronExpression);
+    }
+
+    @Override
+    public void saveKeyWithTTL(String key, String value, long ttlSeconds) {
+        redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(ttlSeconds));
     }
 }
