@@ -1,15 +1,20 @@
 package sba301.java.opentalk.repository;
 
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.w3c.dom.stylesheets.LinkStyle;
+import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
+import sba301.java.opentalk.enums.MeetingStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,6 +36,13 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
                                                  @Param("startDate") LocalDate startDate,
                                                  @Param("endDate") LocalDate endDate,
                                                  Pageable pageable);
+
+    @Query("SELECT o FROM OpenTalkMeeting o WHERE o.status IN :statuses " +
+            "AND (:meetingName IS NULL OR LOWER(o.meetingName) LIKE LOWER(CONCAT('%', :meetingName, '%'))) " +
+            "AND (:branchId IS NULL OR o.companyBranch.id = :branchId)")
+    List<OpenTalkMeeting> findByStatusInWithMeetingNameAndBranchId(@Param("statuses") List<MeetingStatus> statuses,
+                                                                   @Param("meetingName") String meetingName,
+                                                                   @Param("branchId") Long branchId);
 
     @Query("SELECT o FROM OpenTalkMeeting o " +
             "JOIN HostRegistration r ON r.openTalkMeeting.id = o.id " +

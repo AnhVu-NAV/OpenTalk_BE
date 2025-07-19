@@ -3,6 +3,7 @@ package sba301.java.opentalk.controller;
 import lombok.RequiredArgsConstructor;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
+import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.service.HostRegistrationService;
@@ -24,6 +25,16 @@ public class OpenTalkMeetingController {
     @GetMapping
     public ResponseEntity<List<OpenTalkMeetingDTO>> getMeetings() {
         List<OpenTalkMeetingDTO> dtos = openTalkMeetingService.getAllMeetings();
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/details")
+    public ResponseEntity<List<OpenTalkMeetingDetailDTO>> getMeetingDetails(
+            @RequestParam(required = false, defaultValue = "") String meetingName,
+            @RequestParam(required = false) Long branchId
+    ) {
+        List<OpenTalkMeetingDetailDTO> dtos = openTalkMeetingService.getOpenTalkMeetingWithDetails(meetingName,
+                branchId);
         return ResponseEntity.ok(dtos);
     }
 
@@ -69,7 +80,7 @@ public class OpenTalkMeetingController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/employee/{openTalkMeetingId}/register")
+    @PostMapping("/employee/register")
     public ResponseEntity<OpenTalkMeetingDTO> registerOpenTalkMeetingByEmployee(@RequestBody HostRegistrationDTO hostRegistrationDTO) {
         hostRegistrationDTO.setStatus(HostRegistrationStatus.PENDING);
         hostRegistrationService.registerOpenTalk(hostRegistrationDTO);
