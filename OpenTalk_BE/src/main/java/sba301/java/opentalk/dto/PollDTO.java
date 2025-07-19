@@ -4,10 +4,8 @@ import sba301.java.opentalk.entity.OpenTalkMeeting;
 
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@EqualsAndHashCode(callSuper=true)
 public class PollDTO extends BaseDTO {
-    private OpenTalkMeetingDTO openTalkMeetingDTO;
+    private OpenTalkMeetingDTO openTalkMeeting;
     private boolean isEnabled;
 }

@@ -1,7 +1,6 @@
 package sba301.java.opentalk.dto;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 
 @Data

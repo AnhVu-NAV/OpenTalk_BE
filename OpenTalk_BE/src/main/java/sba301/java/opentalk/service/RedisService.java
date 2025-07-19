@@ -19,4 +19,5 @@ public interface RedisService {
 
     void revokeToken(String accessToken, long ttl);
     boolean isTokenRevoked(String accessToken);
+    void savePollScheduleCron(long pollId, String cronExpression);
 }

@@ -107,4 +107,14 @@ public class OpenTalkMeetingController {
         openTalkMeetingService.sendMailRemind(openTalkMeetingId);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/{openTalkMeetingId}")
+    public OpenTalkMeetingDTO getMeetingByID(@PathVariable Long openTalkMeetingId) {
+        return openTalkMeetingService.findMeetingById(openTalkMeetingId);
+    }
+
+    @GetMapping("/meeting/{topicId}")
+    public ResponseEntity<OpenTalkMeetingDTO> getMeetingByTopic(@PathVariable Long topicId) {
+        OpenTalkMeetingDTO openTalkMeetingDTO = openTalkMeetingService.findMeetingByTopicId(topicId);
+        return ResponseEntity.ok(openTalkMeetingDTO);
+    }
 }

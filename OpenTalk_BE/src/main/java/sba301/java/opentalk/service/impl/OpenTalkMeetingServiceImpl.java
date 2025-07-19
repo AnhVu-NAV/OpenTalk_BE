@@ -141,4 +141,14 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         mail.setMailContent("Remind invite the Open Talk Topic " + getMeetingById(openTalkId).get().getMeetingName());
         mailService.sendMail(mail);
     }
+
+    @Override
+    public OpenTalkMeetingDTO findMeetingById(long meetingId) {
+        return openTalkMeetingRepository.findByTopicId(meetingId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+    }
+
+    @Override
+    public OpenTalkMeetingDTO findMeetingByTopicId(long topicId) {
+        return openTalkMeetingRepository.findByTopicId(topicId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+    }
 }

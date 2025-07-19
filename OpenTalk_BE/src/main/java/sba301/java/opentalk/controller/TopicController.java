@@ -1,11 +1,16 @@
 package sba301.java.opentalk.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sba301.java.opentalk.dto.TopicDTO;
+import sba301.java.opentalk.enums.TopicStatus;
 import sba301.java.opentalk.service.TopicService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -21,12 +26,26 @@ public class TopicController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+    @GetMapping("/suggestedBy/{id}")
+    public List<TopicDTO> getTopicByUser(@PathVariable long id) {
+        return topicService.getTopicsByUser(id);
+    }
+
+    @GetMapping("/status")
+    public List<String> getStatus() {
+        List<String> status = new ArrayList<>();
+        Arrays.stream(TopicStatus.values()).map(Enum::toString).forEach(status::add);
+        return status;
+    }
 
     // GET /api/topics → trả về 200 + danh sách DTO (có thể rỗng)
     @GetMapping("/")
-    public ResponseEntity<List<TopicDTO>> getAllTopics() {
-        List<TopicDTO> list = topicService.getAllTopics();
-        return ResponseEntity.ok(list);
+    public ResponseEntity<Page<TopicDTO>> getAllTopics(@RequestParam(defaultValue = "1") int pageNo,
+                                                        @RequestParam(defaultValue = "8") int pageSize,
+                                                        @RequestParam(defaultValue = "") String status,
+                                                       @RequestParam(defaultValue = "") String title ) {
+        Page<TopicDTO> page = topicService.findByStatusAndTitle(status, PageRequest.of(pageNo - 1, pageSize), title);
+        return ResponseEntity.ok(page);
     }
 
     @PostMapping
