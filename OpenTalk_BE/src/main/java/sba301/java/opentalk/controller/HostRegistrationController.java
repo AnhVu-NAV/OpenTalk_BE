@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
+import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.service.HostRegistrationService;
 
 import java.util.List;
@@ -32,5 +33,10 @@ public class HostRegistrationController {
     @GetMapping("/register/interface-projection/{openTalkMeetingId}")
     public ResponseEntity<List<HostRegistrationDTO>> getRegisteredOpenTalksWithInterfaceProjection(@PathVariable Long openTalkMeetingId) {
         return ResponseEntity.ok().body(hostRegistrationService.findByOpenTalkMeetingIdWithInterfaceProjection(openTalkMeetingId));
+    }
+
+    @GetMapping("/auto-select-host/{openTalkMeetingId}")
+    public ResponseEntity<UserDTO> getRandomHost(@PathVariable Long openTalkMeetingId) {
+        return ResponseEntity.ok().body(hostRegistrationService.findRandomHost(openTalkMeetingId));
     }
 }

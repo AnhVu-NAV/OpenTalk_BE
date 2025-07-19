@@ -1,15 +1,12 @@
 package sba301.java.opentalk.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import sba301.java.opentalk.entity.Poll;
+import sba301.java.opentalk.entity.Topic;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@EqualsAndHashCode(callSuper=true)
 public class TopicPollDTO extends BaseDTO {
-    private long topic;
-    private long poll;
+    private TopicDTO topic;
+    private PollDTO poll;
 }

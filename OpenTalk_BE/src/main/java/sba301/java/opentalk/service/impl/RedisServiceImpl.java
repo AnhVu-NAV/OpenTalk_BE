@@ -84,4 +84,9 @@ public class RedisServiceImpl implements RedisService {
         String isRevoked = (String) redisTemplate.opsForValue().get(accessToken);
         return "true".equals(isRevoked);
     }
+
+    @Override
+    public void savePollScheduleCron(long pollId, String cronExpression) {
+        redisTemplate.opsForValue().set(String.valueOf(pollId), cronExpression);
+    }
 }

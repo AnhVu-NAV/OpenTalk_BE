@@ -56,4 +56,6 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
 
     @Query("SELECT o FROM OpenTalkMeeting o WHERE o.scheduledDate = :scheduledDate")
     Optional<OpenTalkMeeting> findByScheduledDate(@Param("scheduledDate") LocalDateTime scheduledDate);
+
+    Optional<OpenTalkMeeting> findByTopicId(Long id);
 }

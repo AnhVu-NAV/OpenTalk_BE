@@ -1,16 +1,18 @@
 package sba301.java.opentalk.repository;
 
 import org.springframework.data.domain.Page;
-import sba301.java.opentalk.entity.User;
-import sba301.java.opentalk.serverHrm.model.UserFromHRM;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.model.UserHostCount;
+import sba301.java.opentalk.serverHrm.model.UserFromHRM;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,5 +61,23 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE LOWER(u.fullName) LIKE %:search% OR LOWER(u.email) LIKE %:search%")
     Page<User> searchByNameOrEmail(@Param("search") String search, Pageable pageable);
+
+    @Query("""
+                SELECT u AS user, COUNT(hr) AS count
+                FROM User u
+                LEFT JOIN HostRegistration hr
+                    ON hr.user = u
+                    AND hr.status = 'APPROVED'
+                    AND hr.openTalkMeeting.scheduledDate BETWEEN :startDate AND :endDate
+                WHERE u.isEnabled = true
+                  AND (:companyBranchId IS NULL OR u.companyBranch.id = :companyBranchId)
+                GROUP BY u
+                ORDER BY COUNT(hr) ASC
+            """)
+    List<UserHostCount> findAllUsersWithApprovedHostCount(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("companyBranchId") Long companyBranchId
+    );
 
 }

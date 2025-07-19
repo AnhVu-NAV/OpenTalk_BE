@@ -1,12 +1,10 @@
-INSERT INTO "company_branch" (id, name) VALUES (1, 'Head Office');
-INSERT INTO "role" (id, name) VALUES (2, 'User');
+INSERT IGNORE INTO role (id, name) VALUES (2, 'User');
 
 INSERT INTO company_branch (created_at, updated_at, name)
-VALUES
-    ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Hà Nội'),
-    ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Thanh Hóa'),
-    ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Đà Nẵng'),
-    ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh TP. HCM');
+VALUES ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Hà Nội'),
+       ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Thanh Hóa'),
+       ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh Đà Nẵng'),
+       ('2025-07-14 20:51:00', '2025-07-14 20:51:00', 'Chi nhánh TP. HCM');
 
 INSERT INTO opental_meeting
 (created_at, updated_at, meeting_link,      meeting_name,        scheduled_date, status,  company_branch_id, topic_id)

@@ -1,15 +1,10 @@
 package sba301.java.opentalk.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@EqualsAndHashCode(callSuper = true)
 public class TopicDTO extends BaseDTO {
     private String title;
     private String description;

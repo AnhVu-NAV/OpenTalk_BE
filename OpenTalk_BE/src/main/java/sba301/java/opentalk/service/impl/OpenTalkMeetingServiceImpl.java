@@ -160,8 +160,8 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         createMeeting(newTopic);
 
         HostRegistrationDTO hostRegistrationDTO = new HostRegistrationDTO();
-        hostRegistrationDTO.setUserId(randomUser.getId());
-        hostRegistrationDTO.setOpenTalkMeetingId(Objects.requireNonNull(meetingRepository.findByScheduledDate(scheduledDate).orElse(null)).getId());
+        hostRegistrationDTO.setUser(randomUser);
+        hostRegistrationDTO.setMeeting(OpenTalkMeetingMapper.INSTANCE.toDto(meetingRepository.findByScheduledDate(scheduledDate).get()));
         hostRegistrationDTO.setStatus(HostRegistrationStatus.APPROVED);
         hostRegistrationService.registerOpenTalk(hostRegistrationDTO);
     }
@@ -175,6 +175,16 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         mail.setMailSubject(MailSubjectFactory.getMailSubject(MailType.REMIND).toString());
         mail.setMailContent("Remind invite the Open Talk Topic " + getMeetingById(openTalkId).get().getMeetingName());
         mailService.sendMail(mail);
+    }
+
+    @Override
+    public OpenTalkMeetingDTO findMeetingById(long meetingId) {
+        return openTalkMeetingRepository.findByTopicId(meetingId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+    }
+
+    @Override
+    public OpenTalkMeetingDTO findMeetingByTopicId(long topicId) {
+        return openTalkMeetingRepository.findByTopicId(topicId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
     }
 
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {
