@@ -2,6 +2,7 @@ package sba301.java.opentalk.service;
 
 import org.springframework.data.domain.Page;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
+import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ public interface OpenTalkMeetingService {
     OpenTalkMeetingDTO updateMeeting(OpenTalkMeetingDTO topic);
 
     List<OpenTalkMeetingDTO> getAllMeetings();
+
+    List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetails(String meetingName, Long branchId);
 
     Page<OpenTalkMeetingDTO> getMeetingsCompleted(OpenTalkCompletedRequest request);
 

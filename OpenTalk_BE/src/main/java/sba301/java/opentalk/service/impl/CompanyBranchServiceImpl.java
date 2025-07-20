@@ -8,6 +8,8 @@ import sba301.java.opentalk.dto.BranchEmployeeCountDTO;
 import sba301.java.opentalk.dto.CompanyBranchDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
 import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.exception.AppException;
+import sba301.java.opentalk.exception.ErrorCode;
 import sba301.java.opentalk.mapper.CompanyBranchMapper;
 import sba301.java.opentalk.repository.CompanyBranchRepository;
 import sba301.java.opentalk.service.CompanyBranchService;
@@ -40,8 +42,9 @@ public class CompanyBranchServiceImpl implements CompanyBranchService {
     }
 
     @Override
-    public Optional<CompanyBranchDTO> getCompanyBranchById(Long id) {
-        return companyBranchRepository.findById(id).map(CompanyBranchMapper.INSTANCE::toDto);
+    public CompanyBranchDTO getCompanyBranchById(Long id) throws AppException {
+        return companyBranchRepository.findById(id).map(CompanyBranchMapper.INSTANCE::toDto)
+                .orElseThrow(() -> new AppException(ErrorCode.COMPANY_BRANCH_NOT_FOUND));
     }
 
     @Override
