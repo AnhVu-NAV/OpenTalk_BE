@@ -25,11 +25,13 @@ public class EndpointPermissions {
 
     public static final List<String> MEETING_MANAGER_ENDPOINTS = List.of(
             "/api/users",
-            "/api/opentalk-topic",
             "/api/cron",
             "/api/health-check",
             "/api/topic-idea/**",
-            "/api/opentalk-meeting/meeting/",
-            "/api/attendance/generate-checkin-code"
+            "/api/attendance/generate-checkin-code",
+            "/api/opentalk-meeting/**",
+            "/api/hosts/**",
+            "/api/company-branch/**",
+            "/api/users/**"
     );
 }

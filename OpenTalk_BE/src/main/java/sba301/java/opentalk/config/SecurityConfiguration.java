@@ -49,16 +49,13 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/topic-idea/suggestedBy/**")
                         .hasAnyRole("ADMIN", "USER")
 
-                        .requestMatchers("/api/opentalk-meeting/meeting/")
-                        .hasRole("ADMIN")
+                        .requestMatchers("/api/opentalk-meeting/**")
+                        .hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers("/api/topic-idea/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers("/api/opentalk-meeting/**")
-                        .hasAnyRole("USER","ADMIN").
-
-                        requestMatchers("/api/topic-poll/**")
+                        .requestMatchers("/api/topic-poll/**")
                         .hasRole("USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")

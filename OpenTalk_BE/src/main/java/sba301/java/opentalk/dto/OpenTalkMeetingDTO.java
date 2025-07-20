@@ -1,13 +1,13 @@
 package sba301.java.opentalk.dto;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import sba301.java.opentalk.enums.MeetingStatus;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 public class OpenTalkMeetingDTO extends BaseDTO {
     private String meetingName;
     private LocalDateTime scheduledDate;
