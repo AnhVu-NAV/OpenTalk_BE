@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sba301.java.opentalk.dto.TopicDTO;
 import sba301.java.opentalk.enums.TopicStatus;
+import sba301.java.opentalk.model.request.DecisionRequest;
 import sba301.java.opentalk.service.TopicService;
 
 import java.util.ArrayList;
@@ -66,4 +67,11 @@ public class TopicController {
         TopicDTO deleted = topicService.deleteTopic(id);
         return ResponseEntity.ok(deleted);
     }
+
+    @PutMapping("/decision")
+    public ResponseEntity<TopicDTO> decision(@RequestBody DecisionRequest decisionRequest) {
+        TopicDTO dto = topicService.evaluteTopic(decisionRequest.getTopicId(), decisionRequest.getDecision(), decisionRequest.getUserId(), decisionRequest.getRemark());
+        return ResponseEntity.ok(dto);
+    }
+
 }

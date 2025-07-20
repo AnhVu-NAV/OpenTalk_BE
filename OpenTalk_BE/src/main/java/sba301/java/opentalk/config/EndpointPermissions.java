@@ -18,6 +18,7 @@ public class EndpointPermissions {
             "/api/topic-idea/suggestedBy/**",
             "/api/opentalk-meeting/**",
             "/api/topic-poll/**",
+            "/api/topic-vote/**",
             "/api/attendance/checkin",
             "/api/attendance/checkin-status"
     );
