@@ -55,7 +55,7 @@ public class SecurityConfiguration {
                         .hasRole("ADMIN")
 
                         .requestMatchers("/api/opentalk-meeting/**")
-                        .hasRole("USER").
+                        .hasAnyRole("USER","ADMIN").
 
                         requestMatchers("/api/topic-poll/**")
                         .hasRole("USER")
