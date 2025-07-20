@@ -30,11 +30,9 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public List<TopicDTO> getAllTopics() {
-        return topicRepository.findAll()
-                .stream()
-                .map(t -> TopicMapper.INSTANCE.toDto(t))
-                .toList();
+    public Page<TopicDTO> getAllTopics(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return topicRepository.findAll(pageable).map(TopicMapper.INSTANCE::toDto);
     }
 
     @Override
@@ -75,6 +73,22 @@ public class TopicServiceImpl implements TopicService {
     public Page<TopicDTO> findByStatusAndTitle(String status, Pageable pageable, String title) {
         Page<Topic> topicPage = topicRepository.findByStatusAndTitle(status, pageable, title);
         return topicPage.map(TopicMapper.INSTANCE::toDto);
+    }
+
+    @Override
+    public TopicDTO evaluteTopic(long id, String decision, long userId, String remark) {
+        Topic topic = topicRepository.findById(id).get();
+        User user = userRepository.findById(userId).get();
+        topic.setEvalutedBy(user);
+        String evalute = "";
+        if("approved".equalsIgnoreCase(decision)) {
+            topic.setStatus("approved");
+        }else if("rejected".equalsIgnoreCase(decision)) {
+            topic.setStatus("rejected");
+            topic.setRemark(remark);
+        }
+        topicRepository.save(topic);
+        return TopicMapper.INSTANCE.toDto(topic);
     }
 
 
