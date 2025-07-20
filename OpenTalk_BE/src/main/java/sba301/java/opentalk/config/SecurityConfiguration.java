@@ -33,7 +33,8 @@ public class SecurityConfiguration {
                                 "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html")
+                                "/swagger-ui.html",
+                                "/api/files/**")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/company-branch/**")
