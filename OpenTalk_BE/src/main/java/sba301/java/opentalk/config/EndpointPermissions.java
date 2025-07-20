@@ -15,6 +15,7 @@ public class EndpointPermissions {
     );
 
     public static final List<String> USER_ENDPOINTS = List.of(
+            "/api/company-branch/**",//GET
             "/api/topic-idea/suggestedBy/**",
             "/api/opentalk-meeting/**",
             "/api/topic-poll/**",
