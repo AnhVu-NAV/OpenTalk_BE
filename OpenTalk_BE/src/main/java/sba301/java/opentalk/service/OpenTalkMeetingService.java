@@ -36,5 +36,4 @@ public interface OpenTalkMeetingService {
     OpenTalkMeetingDTO findMeetingById(long meetingId);
 
     OpenTalkMeetingDTO findMeetingByTopicId(long topicId);
-
 }

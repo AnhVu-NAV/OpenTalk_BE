@@ -118,6 +118,7 @@ public class OpenTalkMeetingController {
         openTalkMeetingService.sendMailRemind(openTalkMeetingId);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/{openTalkMeetingId}")
     public OpenTalkMeetingDTO getMeetingByID(@PathVariable Long openTalkMeetingId) {
         return openTalkMeetingService.findMeetingById(openTalkMeetingId);
