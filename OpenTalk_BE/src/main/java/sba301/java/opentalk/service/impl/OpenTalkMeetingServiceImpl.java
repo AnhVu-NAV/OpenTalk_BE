@@ -253,7 +253,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
         LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(LocalTime.MAX);
 
-        return openTalkMeetingRepository.findByCompanyBranchAndScheduledDateBetween(companyBranchId, startOfMonth, endOfMonth)
+        return openTalkMeetingRepository.findByIdAndScheduledDateBetween(companyBranchId, startOfMonth, endOfMonth)
                 .stream()
                 .map(meeting -> {
                     boolean attended = attendanceRepository.existsAttendanceByUserIdAndOpenTalkMeetingId(userId, meeting.getId());
