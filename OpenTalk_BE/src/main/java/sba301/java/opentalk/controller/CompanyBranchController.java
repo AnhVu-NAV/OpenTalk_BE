@@ -3,6 +3,7 @@ package sba301.java.opentalk.controller;
 import lombok.RequiredArgsConstructor;
 import sba301.java.opentalk.dto.BranchEmployeeCountDTO;
 import sba301.java.opentalk.dto.CompanyBranchDTO;
+import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.service.CompanyBranchService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,13 @@ public class CompanyBranchController {
     public ResponseEntity<List<CompanyBranchDTO>> getCompanyBranchs() {
         List<CompanyBranchDTO> dtos = companyBranchService.getCompanyBranches();
         return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{companyBranchId}")
+    public ResponseEntity<CompanyBranchDTO> getCompanyBranchById(
+            @PathVariable("companyBranchId") Long companyBranchId) throws AppException {
+        CompanyBranchDTO dto = companyBranchService.getCompanyBranchById(companyBranchId);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping

@@ -4,6 +4,7 @@ import sba301.java.opentalk.dto.BranchEmployeeCountDTO;
 import sba301.java.opentalk.dto.CompanyBranchDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
 import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.exception.AppException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +16,7 @@ public interface CompanyBranchService {
 
     Optional<CompanyBranch> findById(Long id);
 
-    Optional<CompanyBranchDTO> getCompanyBranchById(Long id);
+    CompanyBranchDTO getCompanyBranchById(Long id) throws AppException;
 
     CompanyBranchDTO updateCompanyBranch(Long companyBranchId, CompanyBranchDTO companyBranchDTO);
 

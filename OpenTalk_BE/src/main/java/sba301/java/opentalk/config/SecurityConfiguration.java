@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import sba301.java.opentalk.security.AuthenticationFilter;
+
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -33,7 +33,8 @@ public class SecurityConfiguration {
                                 "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html")
+                                "/swagger-ui.html",
+                                "/api/files/**")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/company-branch/**")
@@ -54,8 +55,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/topic-idea/suggestedBy/**")
                         .hasAnyRole("ADMIN", "USER")
 
-                        .requestMatchers("/api/opentalk-meeting/meeting/")
-                        .hasRole("ADMIN")
+                        .requestMatchers("/api/opentalk-meeting/**")
+                        .hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers("/api/topic-idea/**")
                         .hasRole("ADMIN")
@@ -79,7 +80,9 @@ public class SecurityConfiguration {
                                 "/api/users",
                                 "/api/opentalk-topic",
                                 "/api/cron",
-                                "/api/health-check")
+                                "/api/health-check",
+                                "/api/company-branch/**",
+                                "/api/hr/**")
                         .hasRole("ADMIN")
 
                         .anyRequest()

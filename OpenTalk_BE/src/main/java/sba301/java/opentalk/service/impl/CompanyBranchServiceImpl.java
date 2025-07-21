@@ -1,21 +1,19 @@
 package sba301.java.opentalk.service.impl;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.BranchEmployeeCountDTO;
 import sba301.java.opentalk.dto.CompanyBranchDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
 import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.exception.AppException;
+import sba301.java.opentalk.exception.ErrorCode;
 import sba301.java.opentalk.mapper.CompanyBranchMapper;
 import sba301.java.opentalk.repository.CompanyBranchRepository;
-import sba301.java.opentalk.repository.UserRepository;
 import sba301.java.opentalk.service.CompanyBranchService;
 import sba301.java.opentalk.service.NotificationService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +33,7 @@ public class CompanyBranchServiceImpl implements CompanyBranchService {
 
     @Override
     public CompanyBranchDTO createCompanyBranch(CompanyBranchDTO companyBranchDTO) {
-        return CompanyBranchMapper.INSTANCE.toDto(companyBranchRepository.save( CompanyBranchMapper.INSTANCE.toEntity(companyBranchDTO)));
+        return CompanyBranchMapper.INSTANCE.toDto(companyBranchRepository.save(CompanyBranchMapper.INSTANCE.toEntity(companyBranchDTO)));
     }
 
     @Override
@@ -44,8 +42,9 @@ public class CompanyBranchServiceImpl implements CompanyBranchService {
     }
 
     @Override
-    public Optional<CompanyBranchDTO> getCompanyBranchById(Long id) {
-        return companyBranchRepository.findById(id).map(CompanyBranchMapper.INSTANCE::toDto);
+    public CompanyBranchDTO getCompanyBranchById(Long id) throws AppException {
+        return companyBranchRepository.findById(id).map(CompanyBranchMapper.INSTANCE::toDto)
+                .orElseThrow(() -> new AppException(ErrorCode.COMPANY_BRANCH_NOT_FOUND));
     }
 
     @Override

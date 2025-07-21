@@ -1,11 +1,13 @@
 package sba301.java.opentalk.repository;
 
+import jakarta.persistence.Tuple;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sba301.java.opentalk.dto.IHostRegistration;
 import sba301.java.opentalk.entity.HostRegistration;
+import sba301.java.opentalk.entity.User;
 
 import java.util.List;
 
@@ -14,6 +16,10 @@ public interface HostRegistrationRepository extends JpaRepository<HostRegistrati
     boolean existsByUserIdAndOpenTalkMeetingId(Long userId, Long openTalkMeetingId);
 
     List<HostRegistration> findByOpenTalkMeetingId(Long topicId);
+
+    @Query("SELECT r.user AS host, r.openTalkMeeting.id AS meetingId FROM HostRegistration r " +
+            "WHERE r.openTalkMeeting.id IN :meetingIds AND r.status = sba301.java.opentalk.enums.HostRegistrationStatus.APPROVED")
+    List<Tuple> findHostByOpenTalkMeetingIds(List<Long> meetingIds);
 
     @Query(value = "SELECT r.id AS id, r.created_at AS createdAt, r.updated_at AS updatedAt, " +
             "r.user_id AS userId, r.opentalk_meeting_id AS openTalkMeetingId, r.status AS status " +

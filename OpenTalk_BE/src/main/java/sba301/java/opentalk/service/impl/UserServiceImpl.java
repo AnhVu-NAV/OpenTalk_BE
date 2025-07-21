@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final CompanyBranchRepository companyBranchRepository;
-//    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTO createUser(User user) {
@@ -179,17 +180,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(UserDTO userDTO) {
-        // Mặc định role = 2 (USER)
-        Optional<Role> role = roleRepository.findById(2L);
-        if (role.isEmpty()) {
-            throw new RuntimeException("Role not found");
+        // Lấy Role từ roleId trong DTO
+        Role role = roleRepository.findById(userDTO.getRoleId())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        CompanyBranch branch = null;
+        if (userDTO.getCompanyBranch() != null) {
+            branch = companyBranchRepository.findById(userDTO.getCompanyBranch().getId())
+                    .orElseThrow(() -> new RuntimeException("CompanyBranch not found"));
         }
 
-        userDTO.setRole(role.get().getId()); // 👈 Đúng kiểu: Long
+        User user = User.builder()
+                .fullName(userDTO.getFullName())
+                .email(userDTO.getEmail())
+                .username(userDTO.getUsername())
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .avatarUrl(userDTO.getAvatarUrl())
+                .isEnabled(userDTO.getIsEnabled() != null ? userDTO.getIsEnabled() : true)
+                .role(role)
+                .companyBranch(branch)
+                .build();
 
-        User userEntity = UserMapper.INSTANCE.userDTOToUser(userDTO);
-        User saved = userRepository.save(userEntity);
-
+        User saved = userRepository.save(user);
         return UserMapper.INSTANCE.userToUserDTO(saved);
     }
 

@@ -38,7 +38,7 @@ public class HRController {
         return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
-    @PatchMapping("/employees/{id}")
+    @PutMapping("/employees/{id}")
     public ResponseEntity<UserDTO> updateEmployee(@PathVariable Long id, @RequestBody UserDTO dto) {
         UserDTO updated = userService.updateUser(id, dto);
         return ResponseEntity.ok(updated);
