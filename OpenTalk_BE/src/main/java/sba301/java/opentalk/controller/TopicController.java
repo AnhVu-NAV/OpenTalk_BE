@@ -20,26 +20,27 @@ import java.util.List;
 public class TopicController {
     private final TopicService topicService;
 
-
+    //USER AND ADMIN
     @GetMapping("/{id}")
     public ResponseEntity<TopicDTO> getTopic(@PathVariable long id) {
         return topicService.getTopic(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+    //USER AND ADMIN FUNCTION
     @GetMapping("/suggestedBy/{id}")
     public List<TopicDTO> getTopicByUser(@PathVariable long id) {
         return topicService.getTopicsByUser(id);
     }
-
-    @GetMapping("/status")
+    //ADMIN FUNCTION
+    @GetMapping("/admin/status")
     public List<String> getStatus() {
         List<String> status = new ArrayList<>();
         Arrays.stream(TopicStatus.values()).map(Enum::toString).forEach(status::add);
         return status;
     }
 
-    // GET /api/topics → trả về 200 + danh sách DTO (có thể rỗng)
+    //ADMIN FUNCTION
     @GetMapping("/")
     public ResponseEntity<Page<TopicDTO>> getAllTopics(@RequestParam(defaultValue = "1") int pageNo,
                                                         @RequestParam(defaultValue = "8") int pageSize,
@@ -49,7 +50,8 @@ public class TopicController {
         return ResponseEntity.ok(page);
     }
 
-    @PostMapping
+    //USER AND ADMIN FUNCTION
+    @PostMapping()
     public ResponseEntity<TopicDTO> addTopic(@RequestBody TopicDTO dto) {
             topicService.addTopic(dto);
         return ResponseEntity.ok(dto);
@@ -67,11 +69,12 @@ public class TopicController {
         TopicDTO deleted = topicService.deleteTopic(id);
         return ResponseEntity.ok(deleted);
     }
-
-    @PutMapping("/decision")
+    //ADMIN FUNCTION
+    @PutMapping("/admin/decision")
     public ResponseEntity<TopicDTO> decision(@RequestBody DecisionRequest decisionRequest) {
         TopicDTO dto = topicService.evaluteTopic(decisionRequest.getTopicId(), decisionRequest.getDecision(), decisionRequest.getUserId(), decisionRequest.getRemark());
         return ResponseEntity.ok(dto);
     }
+
 
 }

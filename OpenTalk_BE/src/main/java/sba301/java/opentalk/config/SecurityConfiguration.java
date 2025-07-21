@@ -1,7 +1,6 @@
 package sba301.java.opentalk.config;
 
 import lombok.RequiredArgsConstructor;
-import sba301.java.opentalk.security.AuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -47,7 +46,13 @@ public class SecurityConfiguration {
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, "/api/company-branch/**")
+                        .hasRole("ADMIN").
+
+                        requestMatchers(HttpMethod.DELETE, "/api/poll/**")
                         .hasRole("ADMIN")
+
+                        .requestMatchers("/api/topic-vote/**")
+                        .hasAnyRole("ADMIN", "USER")
 
                         .requestMatchers("/api/topic-idea/suggestedBy/**")
                         .hasAnyRole("ADMIN", "USER")
@@ -58,8 +63,11 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/topic-idea/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers("/api/topic-poll/**")
-                        .hasRole("USER")
+                        .requestMatchers("/api/opentalk-meeting/**")
+                        .hasRole("USER").
+
+                        requestMatchers("/api/topic-poll/**")
+                        .hasAnyRole("ADMIN", "USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
                         .hasRole("ADMIN")
@@ -87,5 +95,4 @@ public class SecurityConfiguration {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
 }

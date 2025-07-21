@@ -10,8 +10,7 @@ import sba301.java.opentalk.entity.User;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class TopicVoteDTO {
     private UserDTO voter;
-    private TopicPollDTO topicPoll;
+    private long topicPollId;
 }

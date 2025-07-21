@@ -37,7 +37,13 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public TopicDTO addTopic(TopicDTO topic) {
-         topicRepository.save(TopicMapper.INSTANCE.toEntity(topic));
+        Topic entity = new Topic();
+        entity.setTitle(topic.getTitle());
+        entity.setDescription(topic.getDescription());
+        entity.setStatus("pending");
+        User user = userRepository.findById(topic.getSuggestedBy().getId()).orElse(null);
+        entity.setSuggestedBy(user);
+        topicRepository.save(entity);
          return topic;
     }
 
