@@ -15,4 +15,6 @@ public class OpenTalkMeetingDTO extends BaseDTO {
     private MeetingStatus status;
     private CompanyBranchDTO companyBranch;
     private TopicDTO topic;
+    private UserDTO host;
+    private double duration;
 }
