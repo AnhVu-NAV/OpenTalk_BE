@@ -31,3 +31,34 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# build output
+/target/
+
+# IntelliJ / Eclipse
+*.iml
+*.ipr
+*.iws
+.idea/
+*.classpath
+*.project
+*.settings/
+
+# Maven wrapper
+.mvn/
+!**/mvnw
+!**/mvnw.cmd
+
+# Gradle (if used)
+/build/
+.gradle/
+!gradlew
+!gradlew.bat
+
+# logs
+*.log
+
+# environment
+*.env
+application-*.yml
+application-*.properties
