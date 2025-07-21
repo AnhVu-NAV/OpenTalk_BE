@@ -28,9 +28,9 @@ public class TopicPollController {
         topicPollService.createTopicPoll(topicPollDTO);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/{meetingId}")
-    public List<TopicPollDTO> getTopicPollByMeetingId(@PathVariable("meetingId") int meetingId) {
-        return topicPollService.getTopicPollByMeeting(meetingId);
+    @GetMapping("/{pollId}")
+    public List<TopicPollDTO> getTopicPollByPollId(@PathVariable("pollId") int pollId) {
+        return topicPollService.getTopicPollByPoll(pollId);
     }
     @GetMapping("/detail/{id}")
     public PollDTO getPollById(@PathVariable("id") int id) {

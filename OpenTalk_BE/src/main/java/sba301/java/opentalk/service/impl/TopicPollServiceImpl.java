@@ -7,8 +7,8 @@ import sba301.java.opentalk.dto.PollDTO;
 import sba301.java.opentalk.dto.TopicDTO;
 import sba301.java.opentalk.dto.TopicPollDTO;
 import sba301.java.opentalk.entity.Poll;
-import sba301.java.opentalk.mapper.PollMapper;
 import sba301.java.opentalk.mapper.TopicPollMapper;
+import sba301.java.opentalk.repository.PollRepository;
 import sba301.java.opentalk.repository.TopicPollRepository;
 import sba301.java.opentalk.service.OpenTalkMeetingService;
 import sba301.java.opentalk.service.PollService;
@@ -23,6 +23,8 @@ public class TopicPollServiceImpl implements TopicPollService {
     private final TopicPollRepository topicPollRepository;
     private final PollService pollService;
     private final OpenTalkMeetingService openTalkMeetingService;
+    private final PollRepository pollRepository;
+
     @Override
     public void createTopicPoll(TopicPollDTO topicPollDTO) {
         topicPollRepository.save(TopicPollMapper.INSTANCE.toEntity(topicPollDTO));
@@ -34,9 +36,8 @@ public class TopicPollServiceImpl implements TopicPollService {
     }
 
     @Override
-    public List<TopicPollDTO> getTopicPollByMeeting(long openTalkMeetingId) {
-        PollDTO pollDTO = pollService.getPollByMeeting(openTalkMeetingId);
-        Poll poll = PollMapper.INSTANCE.toEntity(pollDTO);
+    public List<TopicPollDTO> getTopicPollByPoll(long pollId) {
+        Poll poll = pollRepository.findById((int)pollId).get();
         return topicPollRepository.findByPoll(poll).stream().map(TopicPollMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 

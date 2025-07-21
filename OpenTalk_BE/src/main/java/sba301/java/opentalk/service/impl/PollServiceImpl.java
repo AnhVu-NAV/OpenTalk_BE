@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.PollDTO;
-import sba301.java.opentalk.entity.OpenTalkMeeting;
-import sba301.java.opentalk.entity.Poll;
-import sba301.java.opentalk.entity.Topic;
-import sba301.java.opentalk.entity.TopicPoll;
+import sba301.java.opentalk.entity.*;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.PollMapper;
@@ -28,9 +25,9 @@ import java.util.stream.Collectors;
 public class PollServiceImpl implements PollService {
     private final PollRepository pollRepository;
     private final OpenTalkMeetingRepository openTalkMeetingRepository;
-    private final TopicRepository topicRepository;
     private final TopicPollRepository topicPollRepository;
     private final TopicVoteRepository topicVoteRepository;
+    private final UserRepository userRepository;
 
     @Override
     public PollDTO getPollByMeeting(long meetingId) {
@@ -72,17 +69,27 @@ public class PollServiceImpl implements PollService {
     }
 
     @Override
-    public PollDTO createPoll(long meetingId, long topicId) {
+    public PollDTO createPoll(long meetingId) {
         OpenTalkMeeting openTalkMeeting = openTalkMeetingRepository.findById(meetingId).get();
-        Topic topic = topicRepository.findById(topicId).get();
         Poll poll = new Poll();
         poll.setOpenTalkMeeting(openTalkMeeting);
         poll.setEnabled(true);
-        TopicPoll topicPoll = new TopicPoll();
-        topicPoll.setPoll(poll);
-        topicPoll.setTopic(topic);
-        topicPollRepository.save(topicPoll);
         return PollMapper.INSTANCE.toDto(poll);
+    }
+
+    @Override
+    public boolean checkVoteAbility(long pollid, long userId) {
+        User user = userRepository.findById(userId).get();
+        Poll poll = pollRepository.findByOpenTalkMeetingId((int)pollid);
+        List<TopicPoll> listAnswer = topicPollRepository.findByPoll(poll);
+        for(TopicPoll topicPoll : listAnswer) {
+            TopicVote topicVote = new TopicVote();
+            topicVote = topicVoteRepository.findByTopicPollAndVoter(topicPoll, user);
+            if(topicVote == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

@@ -43,7 +43,13 @@ public class SecurityConfiguration {
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, "/api/company-branch/**")
+                        .hasRole("ADMIN").
+
+                        requestMatchers(HttpMethod.DELETE, "/api/poll/**")
                         .hasRole("ADMIN")
+
+                        .requestMatchers("/api/topic-vote/**")
+                        .hasAnyRole("ADMIN", "USER")
 
                         .requestMatchers("/api/topic-idea/suggestedBy/**")
                         .hasAnyRole("ADMIN", "USER")
@@ -58,7 +64,7 @@ public class SecurityConfiguration {
                         .hasRole("USER").
 
                         requestMatchers("/api/topic-poll/**")
-                        .hasRole("USER")
+                        .hasAnyRole("ADMIN", "USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
                         .hasRole("ADMIN")
