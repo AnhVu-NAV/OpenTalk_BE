@@ -1,7 +1,8 @@
 package sba301.java.opentalk.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)

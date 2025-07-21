@@ -2,15 +2,19 @@ package sba301.java.opentalk.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.model.ApiResponse;
 import sba301.java.opentalk.model.request.AuthenticationRequest;
-import sba301.java.opentalk.model.response.AuthenticationResponse;
 import sba301.java.opentalk.model.request.RegisterRequest;
+import sba301.java.opentalk.model.response.AuthenticationResponse;
 import sba301.java.opentalk.service.AuthenticationService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,9 +35,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthenticationResponse> logout(@RequestHeader("Authorization") String accessToken) {
-        authenticationService.logout(accessToken);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    public ResponseEntity<ApiResponse<String>> logout(@RequestHeader("Authorization") String accessToken) {
+        ApiResponse<String> response = authenticationService.logout(accessToken);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
