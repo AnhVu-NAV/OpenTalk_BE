@@ -3,9 +3,9 @@ package sba301.java.opentalk.service;
 import org.springframework.data.domain.Page;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
-import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
+import sba301.java.opentalk.model.response.OpenTalkMeetingWithStatusDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,4 +38,8 @@ public interface OpenTalkMeetingService {
     OpenTalkMeetingDTO findMeetingById(long meetingId);
 
     OpenTalkMeetingDTO findMeetingByTopicId(long topicId);
+
+    List<OpenTalkMeetingDTO> getMeetingsByCheckinCodesInRedis();
+
+    List<OpenTalkMeetingWithStatusDTO> getRecentMeetingsWithStatusAttendance(Long userId, Long companyBranchId);
 }

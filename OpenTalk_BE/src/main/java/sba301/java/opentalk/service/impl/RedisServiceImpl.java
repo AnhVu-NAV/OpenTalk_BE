@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import sba301.java.opentalk.service.RedisService;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -99,5 +102,11 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void saveKeyWithTTL(String key, String value, long ttlSeconds) {
         redisTemplate.opsForValue().set(key, value, Duration.ofSeconds(ttlSeconds));
+    }
+
+    @Override
+    public List<String> getKeysByPattern(String pattern) {
+        Set<String> keys = redisTemplate.keys(pattern);
+        return new ArrayList<>(keys);
     }
 }

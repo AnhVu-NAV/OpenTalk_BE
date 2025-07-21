@@ -10,11 +10,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
+import sba301.java.opentalk.dto.BaseDTO;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
+import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
-import sba301.java.opentalk.dto.*;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.enums.MailType;
@@ -23,7 +24,8 @@ import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
-import sba301.java.opentalk.repository.HostRegistrationRepository;
+import sba301.java.opentalk.model.response.OpenTalkMeetingWithStatusDTO;
+import sba301.java.opentalk.repository.AttendanceRepository;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.service.HostRegistrationService;
@@ -35,7 +37,9 @@ import sba301.java.opentalk.service.UserService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,6 +57,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final MailService mailService;
     private final HostRegistrationRepository hostRegistrationRepository;
+    private final AttendanceRepository attendanceRepository;
 
     @Override
     public OpenTalkMeetingDTO createMeeting(OpenTalkMeetingDTO topic) {
@@ -216,6 +221,45 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     @Override
     public OpenTalkMeetingDTO findMeetingByTopicId(long topicId) {
         return openTalkMeetingRepository.findByTopicId(topicId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+    }
+
+    @Override
+    public List<OpenTalkMeetingDTO> getMeetingsByCheckinCodesInRedis() {
+        List<String> keys = redisService.getKeysByPattern("checkin_code:*");
+
+        if (keys.isEmpty()) return Collections.emptyList();
+
+        List<String> meetingIdStrList = keys.stream()
+                .map(redisService::get)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        if (meetingIdStrList.isEmpty()) return Collections.emptyList();
+
+        List<Long> meetingIds = meetingIdStrList.stream()
+                .map(Long::parseLong)
+                .toList();
+
+        List<OpenTalkMeeting> meetings = openTalkMeetingRepository.findAllById(meetingIds);
+
+        return meetings.stream()
+                .map(OpenTalkMeetingMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OpenTalkMeetingWithStatusDTO> getRecentMeetingsWithStatusAttendance(Long userId, Long companyBranchId) {
+        LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(LocalTime.MAX);
+
+        return openTalkMeetingRepository.findByCompanyBranchAndScheduledDateBetween(companyBranchId, startOfMonth, endOfMonth)
+                .stream()
+                .map(meeting -> {
+                    boolean attended = attendanceRepository.existsAttendanceByUserIdAndOpenTalkMeetingId(userId, meeting.getId());
+                    return new OpenTalkMeetingWithStatusDTO(meeting, attended);
+                })
+                .collect(Collectors.toList());
     }
 
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {

@@ -18,6 +18,7 @@ import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
+import sba301.java.opentalk.model.response.OpenTalkMeetingWithStatusDTO;
 import sba301.java.opentalk.service.HostRegistrationService;
 import sba301.java.opentalk.service.OpenTalkMeetingService;
 
@@ -140,5 +141,18 @@ public class OpenTalkMeetingController {
     public ResponseEntity<OpenTalkMeetingDTO> getMeetingByTopic(@PathVariable Long topicId) {
         OpenTalkMeetingDTO openTalkMeetingDTO = openTalkMeetingService.findMeetingByTopicId(topicId);
         return ResponseEntity.ok(openTalkMeetingDTO);
+    }
+
+    @GetMapping("/meeting-available-to-checkin")
+    public ResponseEntity<List<OpenTalkMeetingDTO>> getMeetingAvailableToCheckin() {
+        return ResponseEntity.ok(openTalkMeetingService.getMeetingsByCheckinCodesInRedis());
+    }
+
+    @GetMapping("/recent-with-status")
+    public ResponseEntity<List<OpenTalkMeetingWithStatusDTO>> getRecentMeetingsWithStatus(
+            @RequestParam Long userId,
+            @RequestParam Long companyBranchId
+    ) {
+        return ResponseEntity.ok(openTalkMeetingService.getRecentMeetingsWithStatusAttendance(userId, companyBranchId));
     }
 }

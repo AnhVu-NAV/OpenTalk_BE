@@ -60,7 +60,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public String submitCheckin(CheckinRequest checkinRequest) throws AppException {
-        String redisKey = "checkin_code:" + checkinRequest.getCheckinCode();
+        String redisKey = "checkin_code" + checkinRequest.getCheckinCode();
         String meetingIdStr = redisService.get(redisKey);
 
         if (meetingIdStr == null) {

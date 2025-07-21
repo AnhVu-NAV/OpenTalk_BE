@@ -1,14 +1,11 @@
 package sba301.java.opentalk.repository;
 
-import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.w3c.dom.stylesheets.LinkStyle;
-import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.enums.MeetingStatus;
 
@@ -78,5 +75,7 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
                                          @Param("fromDate") LocalDateTime fromDate,
                                          @Param("toDate") LocalDateTime toDate,
                                          Pageable pageable);
+
+    List<OpenTalkMeeting> findByCompanyBranchAndScheduledDateBetween(Long companyBranchId, LocalDateTime start, LocalDateTime end);
 
 }
