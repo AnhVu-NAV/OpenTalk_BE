@@ -80,7 +80,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("endDate") LocalDateTime endDate,
             @Param("companyBranchId") Long companyBranchId
     );
-
+    @Query("""
+      SELECT u
+        FROM User u
+       WHERE u.email LIKE CONCAT('%', :email, '%')
+         AND u.isEnabled = :isEnabled
+         AND u.companyBranch = :companyBranch
+    """)
     Page<User> findByEmailAndIsEnabledAndCompanyBranch(String email, Boolean isEnabled, CompanyBranch companyBranch, Pageable pageable);
 
 }

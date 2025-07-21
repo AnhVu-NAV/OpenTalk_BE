@@ -39,7 +39,7 @@ public interface UserService {
 
     public void generateRandom();
 
-    Page<EmployeeDTO> findEmployees(String email, boolean isEnable, int companyBranchId, Pageable pageable);
+    Page<EmployeeDTO> findEmployees(String email, Boolean isEnable, int companyBranchId, Pageable pageable);
 
     EmployeeDTO createUser(EmployeeDTO dto);
 
