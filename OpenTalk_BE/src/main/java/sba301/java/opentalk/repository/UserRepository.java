@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import sba301.java.opentalk.entity.CompanyBranch;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.model.UserHostCount;
 import sba301.java.opentalk.serverHrm.model.UserFromHRM;
@@ -79,5 +80,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("endDate") LocalDateTime endDate,
             @Param("companyBranchId") Long companyBranchId
     );
+
+    Page<User> findByEmailAndIsEnabledAndCompanyBranch(String email, Boolean isEnabled, CompanyBranch companyBranch, Pageable pageable);
 
 }

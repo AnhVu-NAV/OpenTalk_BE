@@ -2,6 +2,12 @@ package sba301.java.opentalk.service.impl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
 import sba301.java.opentalk.entity.User;
@@ -10,12 +16,6 @@ import sba301.java.opentalk.model.ApiResponse;
 import sba301.java.opentalk.model.request.AuthenticationRequest;
 import sba301.java.opentalk.model.request.RegisterRequest;
 import sba301.java.opentalk.model.response.AuthenticationResponse;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import sba301.java.opentalk.service.AuthenticationService;
 import sba301.java.opentalk.service.CompanyBranchService;
 import sba301.java.opentalk.service.JWTService;
@@ -55,7 +55,7 @@ public class AuthenticationSerrviceImpl implements AuthenticationService {
 
         UserDTO createdUser = userService.createUser(newUser);
 
-        AuthenticationResponse authenticationResponse =  AuthenticationResponse.builder()
+        AuthenticationResponse authenticationResponse = AuthenticationResponse.builder()
                 .userDTO(createdUser)
                 .build();
         return ApiResponse.<AuthenticationResponse>builder()
@@ -92,17 +92,21 @@ public class AuthenticationSerrviceImpl implements AuthenticationService {
     }
 
     @Override
-    public ApiResponse<AuthenticationResponse> logout(String accessToken) {
+    public ApiResponse<String> logout(String accessToken) {
         if (accessToken.startsWith("Bearer")) {
             accessToken = accessToken.substring(7);
         }
-        long ttl = (jwtService.extractExpiration(accessToken).getTime()-System.currentTimeMillis())/1000;
+        long ttl = (jwtService.extractExpiration(accessToken).getTime() - System.currentTimeMillis()) / 1000;
         if (ttl > 0) {
             redisService.revokeToken(accessToken, ttl);
         }
 
         redisService.deleteRefreshToken(jwtService.extractUserId(accessToken));
-        return null;
+        return ApiResponse.<String>builder()
+                .code(200)
+                .message("Logged out successfully")
+                .result(null)
+                .build();
     }
 
     @Override

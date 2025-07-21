@@ -8,7 +8,7 @@ import java.util.List;
 public interface TopicPollService {
     public void createTopicPoll(TopicPollDTO topicPollDTO);
     public TopicPollDTO addTopicOption(TopicDTO topicPoll);
-    public List<TopicPollDTO> getTopicPollByMeeting(long openTalkMeetingId);
+    public List<TopicPollDTO> getTopicPollByPoll(long openTalkMeetingId);
     public PollDTO getPollById(long Id);
     public List<TopicPollDTO> getAll();
 }

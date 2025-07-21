@@ -1,14 +1,18 @@
 package sba301.java.opentalk.config;
 
 import lombok.RequiredArgsConstructor;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import sba301.java.opentalk.common.CheckPollStatus;
 import sba301.java.opentalk.common.RandomHostSelectionJob;
 import sba301.java.opentalk.common.SyncDataUserFromHRM;
 import sba301.java.opentalk.service.RedisService;
-import org.quartz.*;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
@@ -44,8 +48,6 @@ public class QuartzConfig {
                 .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
                 .build();
     }
-
-
 
     @Bean
     public Trigger randomTrigger(@Qualifier("randomHostJobDetail") JobDetail jobDetail) {

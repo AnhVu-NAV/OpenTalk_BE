@@ -33,8 +33,12 @@ public class SecurityConfiguration {
                                 "/api/auth/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html")
+                                "/swagger-ui.html",
+                                "/api/files/**")
                         .permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/company-branch/**")
+                        .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/company-branch/**")
                         .hasRole("ADMIN")
@@ -43,22 +47,28 @@ public class SecurityConfiguration {
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, "/api/company-branch/**")
+                        .hasRole("ADMIN").
+
+                        requestMatchers(HttpMethod.DELETE, "/api/poll/**")
                         .hasRole("ADMIN")
+
+                        .requestMatchers("/api/topic-vote/**")
+                        .hasAnyRole("ADMIN", "USER")
 
                         .requestMatchers("/api/topic-idea/suggestedBy/**")
                         .hasAnyRole("ADMIN", "USER")
 
-                        .requestMatchers("/api/opentalk-meeting/meeting/")
-                        .hasRole("ADMIN")
+                        .requestMatchers("/api/opentalk-meeting/**")
+                        .hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers("/api/topic-idea/**")
                         .hasRole("ADMIN")
 
                         .requestMatchers("/api/opentalk-meeting/**")
-                        .hasAnyRole("USER","ADMIN").
+                        .hasRole("USER").
 
                         requestMatchers("/api/topic-poll/**")
-                        .hasRole("USER")
+                        .hasAnyRole("ADMIN", "USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
                         .hasRole("ADMIN")
@@ -72,8 +82,11 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/users",
                                 "/api/opentalk-topic",
+                                "/api/opentalk-meeting",
                                 "/api/cron",
-                                "/api/health-check")
+                                "/api/health-check",
+                                "/api/company-branch/**",
+                                "/api/hr/**")
                         .hasRole("ADMIN")
 
                         .anyRequest()

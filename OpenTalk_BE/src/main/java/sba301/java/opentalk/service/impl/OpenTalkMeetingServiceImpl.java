@@ -5,11 +5,16 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
-import sba301.java.opentalk.dto.*;
+import sba301.java.opentalk.dto.BaseDTO;
+import sba301.java.opentalk.dto.HostRegistrationDTO;
+import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
+import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
+import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
@@ -19,6 +24,8 @@ import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
+import sba301.java.opentalk.model.response.OpenTalkMeetingWithStatusDTO;
+import sba301.java.opentalk.repository.AttendanceRepository;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.service.HostRegistrationService;
@@ -30,6 +37,13 @@ import sba301.java.opentalk.service.UserService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +58,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final MailService mailService;
     private final HostRegistrationRepository hostRegistrationRepository;
+    private final AttendanceRepository attendanceRepository;
 
     @Override
     public OpenTalkMeetingDTO createMeeting(OpenTalkMeetingDTO topic) {
@@ -52,8 +67,9 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     }
 
     @Override
-    public OpenTalkMeetingDTO updateMeeting(OpenTalkMeetingDTO topic) {
-        if (meetingRepository.existsById(topic.getId())) {
+    public OpenTalkMeetingDTO updateMeeting(OpenTalkMeetingDTO topic, Long topicId) {
+        if (meetingRepository.existsById(topicId)) {
+            topic.setId(topicId);
             meetingRepository.save(OpenTalkMeetingMapper.INSTANCE.toEntity(topic));
             return topic;
         }
@@ -61,8 +77,32 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     }
 
     @Override
-    public List<OpenTalkMeetingDTO> getAllMeetings() {
-        return meetingRepository.findAll().stream().map(OpenTalkMeetingMapper.INSTANCE::toDto).toList();
+    public Page<OpenTalkMeetingDTO> getAllMeetings(String name,
+                                                   Long companyBranchId,
+                                                   MeetingStatus status,
+                                                   String dateStr,
+                                                   String fromDateStr,
+                                                   String toDateStr,
+                                                   int page,
+                                                   int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Parse ngày lọc đúng định dạng
+        LocalDate date = (dateStr != null && !dateStr.isEmpty())
+                ? LocalDate.parse(dateStr) : null;
+
+        // Khoảng từ ngày (00:00:00) đến ngày (23:59:59.999)
+        LocalDateTime fromDateTime = (fromDateStr != null && !fromDateStr.isEmpty())
+                ? LocalDate.parse(fromDateStr).atStartOfDay()
+                : null;
+        LocalDateTime toDateTime = (toDateStr != null && !toDateStr.isEmpty())
+                ? LocalDate.parse(toDateStr).atTime(LocalTime.MAX)
+                : null;
+
+        Page<OpenTalkMeeting> meetingPage = meetingRepository.findWithFilter(
+                name, companyBranchId, status, date, fromDateTime, toDateTime, pageable
+        );
+        return meetingPage.map(OpenTalkMeetingMapper.INSTANCE::toDto);
     }
 
     @Override
@@ -195,12 +235,51 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
 
     @Override
     public OpenTalkMeetingDTO findMeetingById(long meetingId) {
-        return openTalkMeetingRepository.findByTopicId(meetingId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+        return openTalkMeetingRepository.findById(meetingId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
     }
 
     @Override
     public OpenTalkMeetingDTO findMeetingByTopicId(long topicId) {
         return openTalkMeetingRepository.findByTopicId(topicId).map(OpenTalkMeetingMapper.INSTANCE::toDto).orElse(null);
+    }
+
+    @Override
+    public List<OpenTalkMeetingDTO> getMeetingsByCheckinCodesInRedis() {
+        List<String> keys = redisService.getKeysByPattern("checkin_code:*");
+
+        if (keys.isEmpty()) return Collections.emptyList();
+
+        List<String> meetingIdStrList = keys.stream()
+                .map(redisService::get)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        if (meetingIdStrList.isEmpty()) return Collections.emptyList();
+
+        List<Long> meetingIds = meetingIdStrList.stream()
+                .map(Long::parseLong)
+                .toList();
+
+        List<OpenTalkMeeting> meetings = openTalkMeetingRepository.findAllById(meetingIds);
+
+        return meetings.stream()
+                .map(OpenTalkMeetingMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OpenTalkMeetingWithStatusDTO> getRecentMeetingsWithStatusAttendance(Long userId, Long companyBranchId) {
+        LocalDateTime startOfMonth = YearMonth.now().atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = YearMonth.now().atEndOfMonth().atTime(LocalTime.MAX);
+
+        return openTalkMeetingRepository.findByIdAndScheduledDateBetween(companyBranchId, startOfMonth, endOfMonth)
+                .stream()
+                .map(meeting -> {
+                    boolean attended = attendanceRepository.existsAttendanceByUserIdAndOpenTalkMeetingId(userId, meeting.getId());
+                    return new OpenTalkMeetingWithStatusDTO(meeting, attended);
+                })
+                .collect(Collectors.toList());
     }
 
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {

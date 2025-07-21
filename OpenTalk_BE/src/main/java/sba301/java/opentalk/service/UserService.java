@@ -2,6 +2,7 @@ package sba301.java.opentalk.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import sba301.java.opentalk.dto.EmployeeDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.exception.AppException;
@@ -20,6 +21,8 @@ public interface UserService {
 
     UserDTO getUserById(Long userId) throws AppException;
 
+    EmployeeDTO getEmployeeById(Long employeeId) throws AppException;
+
     UserDTO updateUser(Long userId, UserDTO dto);
 
     Optional<UserDTO> getUserByUsername(String username);
@@ -36,7 +39,9 @@ public interface UserService {
 
     public void generateRandom();
 
-    Page<UserDTO> findEmployees(String search, Pageable pageable);
+    Page<EmployeeDTO> findEmployees(String email, boolean isEnable, int companyBranchId, Pageable pageable);
 
-    UserDTO createUser(UserDTO dto);
+    EmployeeDTO createUser(EmployeeDTO dto);
+
+    EmployeeDTO updateEmployee(Long userId, EmployeeDTO dto);
 }

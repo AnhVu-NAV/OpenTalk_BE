@@ -5,13 +5,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
+import sba301.java.opentalk.dto.EmployeeDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.CompanyBranch;
 import sba301.java.opentalk.entity.Role;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.exception.ErrorCode;
+import sba301.java.opentalk.mapper.EmployeeMapper;
 import sba301.java.opentalk.mapper.UserMapper;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.repository.CompanyBranchRepository;
@@ -37,7 +40,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final CompanyBranchRepository companyBranchRepository;
-//    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDTO createUser(User user) {
@@ -167,30 +170,78 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDTO> findEmployees(String search, Pageable pageable) {
-        Page<User> users;
-        if (search == null || search.isBlank()) {
-            users = userRepository.findAll(pageable);
-        } else {
-            users = userRepository.searchByNameOrEmail(search.toLowerCase(), pageable);
-        }
-        return users.map(UserMapper.INSTANCE::userToUserDTO);
+    public Page<EmployeeDTO> findEmployees(String email, boolean isEnable, int companyBranch, Pageable pageable) {
+        CompanyBranch company= companyBranchRepository.findById((long)companyBranch).get();
+        Page<User> page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, isEnable, company, pageable);
+        return page.map(EmployeeMapper.INSTANCE::toDto);
     }
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        // Mặc định role = 2 (USER)
-        Optional<Role> role = roleRepository.findById(2L);
-        if (role.isEmpty()) {
-            throw new RuntimeException("Role not found");
+    public EmployeeDTO createUser(EmployeeDTO employeeDTO) {
+        // Lấy Role từ roleId trong DTO
+        Role role = roleRepository.findById(employeeDTO.getRole())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        CompanyBranch branch = null;
+        if (employeeDTO.getCompanyBranch() != null) {
+            branch = companyBranchRepository.findById(employeeDTO.getCompanyBranch().getId())
+                    .orElseThrow(() -> new RuntimeException("CompanyBranch not found"));
         }
 
-        userDTO.setRole(role.get().getId()); // 👈 Đúng kiểu: Long
+        User user = User.builder()
+                .fullName(employeeDTO.getFullName())
+                .email(employeeDTO.getEmail())
+                .username(employeeDTO.getUsername())
+                .password(passwordEncoder.encode(employeeDTO.getPassword()))
+                .avatarUrl(employeeDTO.getAvatarUrl())
+                .isEnabled(employeeDTO.getIsEnabled() != null ? employeeDTO.getIsEnabled() : true)
+                .role(role)
+                .companyBranch(branch)
+                .build();
 
-        User userEntity = UserMapper.INSTANCE.userDTOToUser(userDTO);
-        User saved = userRepository.save(userEntity);
+        User saved = userRepository.save(user);
+        return employeeDTO;
+    }
 
-        return UserMapper.INSTANCE.userToUserDTO(saved);
+    @Override
+    public EmployeeDTO updateEmployee(Long userId, EmployeeDTO dto) {
+        User existingUser = userRepository.findById(userId).orElse(null);
+        CompanyBranch companyBranch = new CompanyBranch();
+        if (existingUser != null) {
+            if (dto.getFullName() != null) {
+                existingUser.setFullName(dto.getFullName());
+            }
+            if (dto.getEmail() != null) {
+                existingUser.setEmail(dto.getEmail());
+            }
+            if (dto.getUsername() != null) {
+                existingUser.setUsername(dto.getUsername());
+            }
+            if (dto.getIsEnabled() != null) {
+                existingUser.setIsEnabled(dto.getIsEnabled());
+            }
+            if (dto.getCompanyBranch() != null) {
+                companyBranch = companyBranchRepository.findById(dto.getCompanyBranch().getId()).get();
+                existingUser.setCompanyBranch(companyBranch);
+            }
+            if (dto.getUpdatedAt() != null) {
+                existingUser.setUpdatedAt(dto.getUpdatedAt());
+            }
+            companyBranch.setName("Ha Noi");
+            log.info("===========================");
+            companyBranch.addUser(existingUser);
+            log.info("============ Save company branch ===============");
+//            companyBranchRepository.save(companyBranch);
+//            userRepository.save(existingUser);
+            log.info("Updated data at cache.");
+            return EmployeeMapper.INSTANCE.toDto(existingUser);
+        }
+        return null;
+    }
+
+    @Override
+    public EmployeeDTO getEmployeeById(Long employeeId) throws AppException {
+        return userRepository.findById(employeeId).map(EmployeeMapper.INSTANCE::toDto).orElse(null);
     }
 
 }

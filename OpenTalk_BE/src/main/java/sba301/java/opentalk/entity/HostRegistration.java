@@ -9,7 +9,6 @@ import sba301.java.opentalk.enums.HostRegistrationStatus;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @EqualsAndHashCode(callSuper = true)
 public class HostRegistration extends BaseEntity{
     @ManyToOne
