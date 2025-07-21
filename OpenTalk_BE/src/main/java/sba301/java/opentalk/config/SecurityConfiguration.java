@@ -12,7 +12,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -36,6 +35,9 @@ public class SecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/api/files/**")
                         .permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/company-branch/**")
+                        .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/api/company-branch/**")
                         .hasRole("ADMIN")
@@ -79,6 +81,7 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 "/api/users",
                                 "/api/opentalk-topic",
+                                "/api/opentalk-meeting",
                                 "/api/cron",
                                 "/api/health-check",
                                 "/api/company-branch/**",

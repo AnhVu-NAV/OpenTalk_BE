@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @EqualsAndHashCode(callSuper = true)
 public class OpenTalkMeeting extends BaseEntity {
     @Column(name = "meeting_name", unique = true, nullable = false, length = 255)
@@ -31,6 +30,13 @@ public class OpenTalkMeeting extends BaseEntity {
     @OneToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User host;
+
+    @Column(name = "duration", nullable = false)
+    private double duration;
 
     @ManyToOne
     @JoinColumn(name = "company_branch_id", nullable = false)

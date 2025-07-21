@@ -58,4 +58,25 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
     Optional<OpenTalkMeeting> findByScheduledDate(@Param("scheduledDate") LocalDateTime scheduledDate);
 
     Optional<OpenTalkMeeting> findByTopicId(Long id);
+
+    @Query("SELECT o FROM OpenTalkMeeting o " +
+            "JOIN o.companyBranch cb " +
+            "WHERE " +
+            "(:name IS NULL OR LOWER(o.meetingName) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+            "AND (:companyBranchId IS NULL OR cb.id = :companyBranchId) " +
+            "AND (:status IS NULL OR o.status = :status) " +
+            "AND ( " +
+            "   (:date IS NULL OR FUNCTION('DATE', o.scheduledDate) = :date) " +
+            ") " +
+            "AND (:fromDate IS NULL OR o.scheduledDate >= :fromDate) " +
+            "AND (:toDate IS NULL OR o.scheduledDate <= :toDate) "
+    )
+    Page<OpenTalkMeeting> findWithFilter(@Param("name") String name,
+                                         @Param("companyBranchId") Long companyBranchId,
+                                         @Param("status") MeetingStatus status,
+                                         @Param("date") LocalDate date,
+                                         @Param("fromDate") LocalDateTime fromDate,
+                                         @Param("toDate") LocalDateTime toDate,
+                                         Pageable pageable);
+
 }

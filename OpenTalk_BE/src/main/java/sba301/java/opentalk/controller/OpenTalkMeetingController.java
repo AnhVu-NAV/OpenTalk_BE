@@ -16,6 +16,7 @@ import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
+import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.service.HostRegistrationService;
 import sba301.java.opentalk.service.OpenTalkMeetingService;
@@ -31,8 +32,19 @@ public class OpenTalkMeetingController {
     private final HostRegistrationService hostRegistrationService;
 
     @GetMapping
-    public ResponseEntity<List<OpenTalkMeetingDTO>> getMeetings() {
-        List<OpenTalkMeetingDTO> dtos = openTalkMeetingService.getAllMeetings();
+    public ResponseEntity<Page<OpenTalkMeetingDTO>> getMeetings(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long companyBranchId,
+            @RequestParam(required = false) MeetingStatus status,
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<OpenTalkMeetingDTO> dtos = openTalkMeetingService.getAllMeetings(
+                name, companyBranchId, status, date, fromDate, toDate, page, size
+        );
         return ResponseEntity.ok(dtos);
     }
 
@@ -103,8 +115,8 @@ public class OpenTalkMeetingController {
     }
 
     @PutMapping("/{openTalkMeetingId}")
-    public ResponseEntity<OpenTalkMeetingDTO> updateOpenTalkMeeting(@RequestBody OpenTalkMeetingDTO dto) {
-        OpenTalkMeetingDTO openTalkMeetingDTO = openTalkMeetingService.updateMeeting(dto);
+    public ResponseEntity<OpenTalkMeetingDTO> updateOpenTalkMeeting(@RequestBody OpenTalkMeetingDTO dto, @PathVariable Long openTalkMeetingId) {
+        OpenTalkMeetingDTO openTalkMeetingDTO = openTalkMeetingService.updateMeeting(dto, openTalkMeetingId);
         return ResponseEntity.ok(openTalkMeetingDTO);
     }
 
