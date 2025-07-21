@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +21,7 @@ public class OpenTalkMeetingDetailDTO extends BaseDTO {
     private String status;
     private TopicDTO topic;
     private UserDTO host;
+    private List<Long> registeredHostUserIds;
     private CompanyBranchDTO companyBranch;
 
     @Getter
@@ -41,6 +43,7 @@ public class OpenTalkMeetingDetailDTO extends BaseDTO {
     @NoArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class UserDTO {
+        private String avatarUrl;
         private String username;
         private String email;
         private String fullName;

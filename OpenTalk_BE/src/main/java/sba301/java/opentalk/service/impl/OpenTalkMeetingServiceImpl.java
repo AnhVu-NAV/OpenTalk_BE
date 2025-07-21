@@ -36,6 +36,7 @@ import sba301.java.opentalk.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Arrays;
@@ -113,16 +114,35 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                         MeetingStatus.ONGOING,
                         MeetingStatus.COMPLETED), meetingName, branchId)
                 .stream().map(this::convertToDetailDTO).collect(Collectors.toList());
-        List<Long> meetingIds = meetingDetails.stream().filter(
+
+        List<Long> meetingIdsHasHost = meetingDetails.stream().filter(
                 meetingDetail -> !Objects.equals(meetingDetail.getStatus(), String.valueOf(MeetingStatus.WAITING_HOST_REGISTER))
         ).map(BaseDTO::getId).toList();
-        List<Tuple> hostData = hostRegistrationRepository.findHostByOpenTalkMeetingIds(meetingIds);
+
+        List<Long> meetingIdsNoHost = meetingDetails.stream().filter(
+                meetingDetail -> Objects.equals(meetingDetail.getStatus(), String.valueOf(MeetingStatus.WAITING_HOST_REGISTER))
+        ).map(BaseDTO::getId).toList();
+
+        Map<Long, List<Long>> mapMeetingWithPendingHosts = hostRegistrationRepository
+                .findUserIdAndOpenTalkMeetingIdsByOpenTalkMeetingId(meetingIdsNoHost)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        tuple -> tuple.get("openTalkMeetingId", Long.class),
+                        Collectors.mapping(tuple -> tuple.get("userId", Long.class), Collectors.toList())
+                ));
+
+        meetingDetails.forEach(meetingDetail -> {
+            meetingDetail.setRegisteredHostUserIds(mapMeetingWithPendingHosts.get(meetingDetail.getId()));
+        });
+
+        List<Tuple> hostData = hostRegistrationRepository.findHostByOpenTalkMeetingIds(meetingIdsHasHost);
         meetingDetails.forEach(meetingDetail -> {
             OpenTalkMeetingDetailDTO.UserDTO userHost = hostData
                     .stream().filter(t -> Objects.equals(t.get("meetingId", Long.class), meetingDetail.getId()))
                     .findFirst()
                     .map(t -> t.get("host", User.class))
                     .map(u -> new OpenTalkMeetingDetailDTO.UserDTO(
+                            u.getAvatarUrl(),
                             u.getUsername(),
                             u.getEmail(),
                             u.getFullName(),
@@ -275,6 +295,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                 meeting.getTopic().getDescription(),
                 meeting.getTopic().getRemark(),
                 new OpenTalkMeetingDetailDTO.UserDTO(
+                        meeting.getTopic().getSuggestedBy().getAvatarUrl(),
                         meeting.getTopic().getSuggestedBy().getUsername(),
                         meeting.getTopic().getSuggestedBy().getEmail(),
                         meeting.getTopic().getSuggestedBy().getFullName(),
@@ -283,6 +304,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                         )
                 ),
                 new OpenTalkMeetingDetailDTO.UserDTO(
+                        meeting.getTopic().getEvalutedBy() != null ? meeting.getTopic().getEvalutedBy().getAvatarUrl() : null,
                         meeting.getTopic().getEvalutedBy() != null ? meeting.getTopic().getEvalutedBy().getUsername() : null,
                         meeting.getTopic().getEvalutedBy() != null ? meeting.getTopic().getEvalutedBy().getEmail() : null,
                         meeting.getTopic().getEvalutedBy() != null ? meeting.getTopic().getEvalutedBy().getFullName() : null,

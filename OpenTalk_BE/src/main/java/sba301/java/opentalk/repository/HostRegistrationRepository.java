@@ -26,6 +26,10 @@ public interface HostRegistrationRepository extends JpaRepository<HostRegistrati
             "FROM host_registration r WHERE r.opentalk_meeting_id = :topicId", nativeQuery = true)
     List<IHostRegistration> findRegistrationsByTopicId(@Param("topicId") Long topicId);
 
+    @Query("SELECT r.user.id AS userId, r.openTalkMeeting.id AS openTalkMeetingId " +
+            "FROM HostRegistration r WHERE r.openTalkMeeting.id IN :meetingIds")
+    List<Tuple> findUserIdAndOpenTalkMeetingIdsByOpenTalkMeetingId(List<Long> meetingIds);
+
     @Query("SELECT r FROM HostRegistration r " +
             "JOIN r.openTalkMeeting t " +
             "JOIN r.user u " +
