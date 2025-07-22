@@ -43,5 +43,4 @@ public class TopicPollController {
         return pollService.findById(id);
     }
 
-
 }

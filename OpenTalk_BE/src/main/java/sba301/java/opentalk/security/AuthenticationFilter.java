@@ -71,7 +71,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/swagger-ui/") ||
                 path.startsWith("/v3/api-docs") ||
                 path.equals("/swagger-ui.html") ||
-                path.startsWith("/api/health-check/") ||
-                path.startsWith("/api/files/");
+                path.startsWith("/api/health-check/");
     }
 }

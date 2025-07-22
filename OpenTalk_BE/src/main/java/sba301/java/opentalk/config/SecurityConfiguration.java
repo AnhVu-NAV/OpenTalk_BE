@@ -45,45 +45,21 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/feedbacks/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/files/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/files/**").hasRole("MEETING_MANAGER")
-
-                        .requestMatchers(HttpMethod.DELETE, "/api/poll/**").hasRole("MEETING_MANAGER")
-
-                        .requestMatchers("/api/topic-vote/**")
-                        .hasAnyRole("MEETING_MANAGER", "USER")
-
-                        .requestMatchers("/api/topic-idea/suggestedBy/**")
-                        .hasAnyRole("MEETING_MANAGER", "USER")
-
-                        .requestMatchers("/api/opentalk-meeting/**")
-                        .hasAnyRole("USER", "MEETING_MANAGER")
-
-                        .requestMatchers("/api/topic-idea/**")
-                        .hasRole("MEETING_MANAGER")
-
-                        .requestMatchers("/api/opentalk-meeting/**")
-                        .hasRole("USER").
-
-                        requestMatchers("/api/topic-poll/**")
-                        .hasAnyRole("MEETING_MANAGER", "USER")
-
-                        .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
-                        .hasRole("MEETING_MANAGER")
-
-                        .requestMatchers(HttpMethod.POST, "/api/attendance/checkin")
-                        .hasRole("USER")
-
-                        .requestMatchers(HttpMethod.GET, "/api/attendance/checkin-status")
-                        .hasRole("USER")
-
-                        .requestMatchers(
-                                "/api/users",
-                                "/api/opentalk-topic",
-                                "/api/opentalk-meeting",
-                                "/api/cron",
-                                "/api/health-check",
-                                "/api/company-branch/**",
-                                "/api/hr/**")
-                        .hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/api/poll/**").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/poll/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea/admin/status").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/topic-idea/admin/decision").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea/suggestedBy/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea/{id}").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.POST, "/api/topic-idea").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/topic-idea").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/topic-idea/{id}").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/topic-poll/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/topic-vote/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/opentalk-meeting/**").hasAnyRole("USER", "MEETING_MANAGER")
+                        .requestMatchers("/api/hr/**").hasRole("HR")
+                        .requestMatchers("/api/salaries/**").hasRole("HR")
 
                         .anyRequest()
                         .authenticated())
