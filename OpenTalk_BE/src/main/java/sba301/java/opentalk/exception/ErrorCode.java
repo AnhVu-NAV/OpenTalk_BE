@@ -13,7 +13,8 @@ public enum ErrorCode {
     INVALID_OR_EXPIRED_CODE(1011, "INVALID_OR_EXPIRED_CODE", HttpStatus.BAD_REQUEST),
     ALREADY_CHECKED_IN(1012, "USER HAS ALREADY CHECKED IN", HttpStatus.CONFLICT),
     MEETING_NOT_FOUND(1013, "MEETING NOT FOUND", HttpStatus.NOT_FOUND),
-    COMPANY_BRANCH_NOT_FOUND(1010, "COMPANY_BRANCH_NOT_FOUND", HttpStatus.NOT_FOUND);
+    COMPANY_BRANCH_NOT_FOUND(1010, "COMPANY_BRANCH_NOT_FOUND", HttpStatus.NOT_FOUND),
+    FEEDBACK_ALREADY_SUBMITTED(4001, "You have already submitted feedback for this meeting.", HttpStatus.BAD_REQUEST);;
 
     private final int code;
     private final String message;
