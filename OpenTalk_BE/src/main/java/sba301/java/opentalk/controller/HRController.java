@@ -25,14 +25,10 @@ public class HRController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "") String email,
             @RequestParam(required = false) Boolean isEnable,
-            @RequestParam(defaultValue = "2") int companyBranchId
+            @RequestParam(required = false) Long companyBranchId
     ) {
         Page<EmployeeDTO> employees = null;
-        if (isEnable == null) {
-            employees = userService.findEmployees(email, true, companyBranchId,PageRequest.of(page, size));
-        }else{
-            employees = userService.findEmployees(email, isEnable, companyBranchId,PageRequest.of(page, size));
-        }
+        employees = userService.findEmployees(email, isEnable, companyBranchId,PageRequest.of(page, size));
         return ResponseEntity.ok(employees);
     }
 
