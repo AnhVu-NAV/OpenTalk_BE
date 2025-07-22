@@ -82,7 +82,7 @@ public class SecurityConfiguration {
                                 "/api/health-check",
                                 "/api/company-branch/**",
                                 "/api/hr/**")
-                        .hasRole("ADMIN")
+                        .hasRole("MEETING_MANAGER")
 
                         .anyRequest()
                         .authenticated())
