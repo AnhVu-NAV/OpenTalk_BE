@@ -17,6 +17,7 @@ import sba301.java.opentalk.service.AttendanceService;
 import sba301.java.opentalk.service.RedisService;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -101,7 +102,9 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public Integer countAttendanceByUserId(Long userId) {
-        return attendanceRepository.countAttendanceByUserId(userId);
+    public Integer countAttendanceByUserIdAndValidTime(Long userId, LocalDate dateFrom, LocalDate dateTo) {
+        LocalDateTime start = dateFrom.atStartOfDay();
+        LocalDateTime end = dateTo.plusDays(1).atStartOfDay();
+        return attendanceRepository.countAttendanceByUserIdAndCreatedAtBetween(userId, start, end);
     }
 }

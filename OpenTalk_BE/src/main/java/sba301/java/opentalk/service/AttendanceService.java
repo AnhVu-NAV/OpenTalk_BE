@@ -4,6 +4,8 @@ import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.model.request.CheckinRequest;
 import sba301.java.opentalk.model.response.CheckinCodeGenerateResponse;
 
+import java.time.LocalDate;
+
 public interface AttendanceService {
     boolean isCheckin(Long meetingId, Long userId);
 
@@ -13,5 +15,5 @@ public interface AttendanceService {
 
     String getCheckinCode(Long meetingId);
 
-    Integer countAttendanceByUserId(Long userId);
+    Integer countAttendanceByUserIdAndValidTime(Long userId, LocalDate dateFrom, LocalDate dateTo);
 }
