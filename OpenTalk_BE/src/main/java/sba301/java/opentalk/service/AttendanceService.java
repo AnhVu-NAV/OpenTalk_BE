@@ -13,7 +13,7 @@ public interface AttendanceService {
 
     String submitCheckin(CheckinRequest checkinRequest) throws AppException;
 
-    String getCheckinCode(Long meetingId);
+    CheckinCodeGenerateResponse getCheckinCode(Long meetingId);
 
     Integer countAttendanceByUserIdAndValidTime(Long userId, LocalDate dateFrom, LocalDate dateTo);
 }

@@ -40,7 +40,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/checkin-code")
-    public ResponseEntity<String> getCheckinCode(@RequestParam Long meetingId) {
+    public ResponseEntity<CheckinCodeGenerateResponse> getCheckinCode(@RequestParam Long meetingId) {
         return ResponseEntity.ok(attendanceService.getCheckinCode(meetingId));
     }
 }

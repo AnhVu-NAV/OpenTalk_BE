@@ -5,6 +5,8 @@ import java.util.List;
 public interface RedisService {
     String get(String key);
 
+    long getRemainingTtl(String key);
+
     void saveRefreshToken(long userId, String refreshToken, long duration);
 
     String getRefreshToken(long userId);

@@ -90,12 +90,14 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public String getCheckinCode(Long meetingId) {
+    public CheckinCodeGenerateResponse getCheckinCode(Long meetingId) {
         List<String> keys = redisService.getKeysByPattern("checkin_code:*");
         for (String key : keys) {
             String value = redisService.get(key);
+            long ttlInSeconds = redisService.getRemainingTtl(key);
+            LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(ttlInSeconds);
             if (String.valueOf(meetingId).equals(value)) {
-                return key.replace("checkin_code:", "");
+                return new CheckinCodeGenerateResponse(key.replace("checkin_code:", ""), expiresAt);
             }
         }
         return null;

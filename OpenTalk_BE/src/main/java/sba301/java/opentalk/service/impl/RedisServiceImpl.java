@@ -26,6 +26,11 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public long getRemainingTtl(String key) {
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    }
+
+    @Override
     public void saveRefreshToken(long userId, String refreshToken, long duration) {
         String key = "refresh_token:" + userId;
         redisTemplate.opsForValue().set(key, refreshToken, duration / 1000, TimeUnit.SECONDS);
