@@ -18,6 +18,7 @@ import sba301.java.opentalk.service.RedisService;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +61,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public String submitCheckin(CheckinRequest checkinRequest) throws AppException {
-        String redisKey = "checkin_code" + checkinRequest.getCheckinCode();
+        String redisKey = CHECKIN_CODE + checkinRequest.getCheckinCode();
         String meetingIdStr = redisService.get(redisKey);
 
         if (meetingIdStr == null) {
@@ -85,5 +86,17 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendanceRepository.save(attendance);
 
         return CheckinStatus.SUCCESS.toString();
+    }
+
+    @Override
+    public String getCheckinCode(Long meetingId) {
+        List<String> keys = redisService.getKeysByPattern("checkin_code:*");
+        for (String key : keys) {
+            String value = redisService.get(key);
+            if (String.valueOf(meetingId).equals(value)) {
+                return key.replace("checkin_code:", "");
+            }
+        }
+        return null;
     }
 }

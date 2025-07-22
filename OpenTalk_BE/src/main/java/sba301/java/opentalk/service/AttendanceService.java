@@ -10,4 +10,6 @@ public interface AttendanceService {
     CheckinCodeGenerateResponse generateCheckinCode(Long meetingId, int validMinutes);
 
     String submitCheckin(CheckinRequest checkinRequest) throws AppException;
+
+    String getCheckinCode(Long meetingId);
 }
