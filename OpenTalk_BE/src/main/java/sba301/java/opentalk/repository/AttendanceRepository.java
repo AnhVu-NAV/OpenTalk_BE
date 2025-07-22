@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import sba301.java.opentalk.entity.Attendance;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     boolean existsAttendanceByUserIdAndOpenTalkMeetingId(Long userId, Long openTalkMeetingId);
@@ -17,4 +18,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
+    List<Attendance> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    List<Attendance> findAllByUserIdOrderByCreatedAtAsc(Long userId);
 }
