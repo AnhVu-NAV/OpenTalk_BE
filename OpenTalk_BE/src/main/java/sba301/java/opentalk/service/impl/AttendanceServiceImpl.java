@@ -99,4 +99,9 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
         return null;
     }
+
+    @Override
+    public Integer countAttendanceByUserId(Long userId) {
+        return attendanceRepository.countAttendanceByUserId(userId);
+    }
 }

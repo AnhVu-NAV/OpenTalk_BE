@@ -12,4 +12,6 @@ public interface AttendanceService {
     String submitCheckin(CheckinRequest checkinRequest) throws AppException;
 
     String getCheckinCode(Long meetingId);
+
+    Integer countAttendanceByUserId(Long userId);
 }

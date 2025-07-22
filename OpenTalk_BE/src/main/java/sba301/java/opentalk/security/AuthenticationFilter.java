@@ -27,9 +27,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private final RedisService redisService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         if (isBypassToken(request)) {
             filterChain.doFilter(request, response);
