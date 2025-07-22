@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sba301.java.opentalk.dto.IHostRegistration;
+import sba301.java.opentalk.dto.UserHostFrequency;
 import sba301.java.opentalk.entity.HostRegistration;
 import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.model.response.HostFrequencyResponse;
 
 import java.util.List;
 
@@ -36,4 +38,17 @@ public interface HostRegistrationRepository extends JpaRepository<HostRegistrati
             "JOIN r.user.role ro " +
             "WHERE r.openTalkMeeting.id = :topicId")
     List<HostRegistration> findByOpenTalkMeetingIdWithNativeQuery(@Param("topicId") Long topicId);
+
+    @Query(value = """
+            SELECT  u.id AS userId,
+                    u.full_name AS fullName,
+                    c.name AS branchName,
+                    SUM(CASE WHEN t.status = 'APPROVED' THEN 1 ELSE 0 END) AS approvedCount,
+                    MAX(CASE WHEN t.status = 'APPROVED' THEN t.created_at END) AS lastApprovedAt
+            FROM `user` u
+            LEFT JOIN host_registration t ON t.user_id = u.id
+            LEFT JOIN company_branch c ON u.company_branch_id = c.id
+            GROUP BY u.id, u.full_name, c.name
+            """, nativeQuery = true)
+    List<UserHostFrequency> getUserHostFrequency();
 }

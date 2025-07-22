@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.IHostRegistration;
 import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.dto.UserHostFrequency;
 import sba301.java.opentalk.entity.HostRegistration;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.User;
@@ -17,6 +18,7 @@ import sba301.java.opentalk.event.HostRegistrationEvent;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.UserMapper;
 import sba301.java.opentalk.model.UserHostCount;
+import sba301.java.opentalk.model.response.HostFrequencyResponse;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.repository.UserRepository;
@@ -119,5 +121,19 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
         hostRegistrationRepository.save(registration);
 
         return UserMapper.INSTANCE.userToUserDTO(selected);
+    }
+
+    @Override
+    public List<HostFrequencyResponse> getUserHostFrequency() {
+        List<UserHostFrequency> userHostFrequencyList = hostRegistrationRepository.getUserHostFrequency();
+        return userHostFrequencyList.stream().map(userHostFrequency -> {
+                HostFrequencyResponse hostFrequencyResponse = new HostFrequencyResponse(
+                        userHostFrequency.getUserId(),
+                        userHostFrequency.getFullName(),
+                        userHostFrequency.getBranchName(),
+                        userHostFrequency.getApprovedCount(),
+                        userHostFrequency.getLastApprovedAt());
+                        return hostFrequencyResponse;
+        }).toList();
     }
 }

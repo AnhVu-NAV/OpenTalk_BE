@@ -175,9 +175,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<EmployeeDTO> findEmployees(String email, Boolean isEnable, int companyBranch, Pageable pageable) {
-        CompanyBranch company= companyBranchRepository.findById((long)companyBranch).get();
-        Page<User> page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, isEnable, company, pageable);
+    public Page<EmployeeDTO> findEmployees(String email, Boolean isEnable, Long companyBranch, Pageable pageable) {
+        Page<User> page = null;
+        if (isEnable == null ||companyBranch == null ) {
+            page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, null, null, pageable);
+        }else{
+            CompanyBranch company= companyBranchRepository.findById((long)companyBranch).get();
+            page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, isEnable, company, pageable);
+        }
         return page.map(EmployeeMapper.INSTANCE::toDto);
     }
 

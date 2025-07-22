@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.model.response.HostFrequencyResponse;
 import sba301.java.opentalk.service.HostRegistrationService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -38,5 +40,11 @@ public class HostRegistrationController {
     @GetMapping("/auto-select-host/{openTalkMeetingId}")
     public ResponseEntity<UserDTO> getRandomHost(@PathVariable Long openTalkMeetingId) {
         return ResponseEntity.ok().body(hostRegistrationService.findRandomHost(openTalkMeetingId));
+    }
+
+    @GetMapping("/native-query/frequency")
+    public ResponseEntity<List<HostFrequencyResponse>> getUserFrequency() {
+        List<HostFrequencyResponse> list = hostRegistrationService.getUserHostFrequency();
+        return ResponseEntity.ok().body(list);
     }
 }
