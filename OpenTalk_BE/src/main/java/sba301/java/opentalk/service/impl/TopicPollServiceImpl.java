@@ -37,8 +37,7 @@ public class TopicPollServiceImpl implements TopicPollService {
 
     @Override
     public List<TopicPollDTO> getTopicPollByPoll(long pollId) {
-        Poll poll = pollRepository.findById((int)pollId).get();
-        return topicPollRepository.findByPoll(poll).stream().map(TopicPollMapper.INSTANCE::toDto).collect(Collectors.toList());
+        return topicPollRepository.findByPollId(pollId).stream().map(TopicPollMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
     @Override

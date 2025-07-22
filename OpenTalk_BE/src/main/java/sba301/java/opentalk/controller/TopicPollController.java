@@ -23,7 +23,7 @@ public class TopicPollController {
         return topicPollService.getAll();
     }
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<TopicPollDTO> createNewTopicPoll(@RequestBody TopicPollDTO topicPollDTO) {
         topicPollService.createTopicPoll(topicPollDTO);
         return ResponseEntity.ok().build();

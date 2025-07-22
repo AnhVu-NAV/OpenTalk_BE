@@ -28,7 +28,6 @@ public class TopicVoteController {
     @GetMapping("/check/")
     public boolean checkVoteAbility(@RequestParam long userId, @RequestParam long pollId) {
         return pollService.checkVoteAbility(pollId, userId);
-
     }
 
     @GetMapping("/result/{pollId}")

@@ -5,7 +5,9 @@ import sba301.java.opentalk.entity.TopicPoll;
 import sba301.java.opentalk.entity.TopicVote;
 import sba301.java.opentalk.entity.User;
 
+import java.util.List;
+
 public interface TopicVoteRepository extends JpaRepository<TopicVote, Long> {
      long countByTopicPoll(TopicPoll topicPoll);
-     TopicVote findByTopicPollAndVoter(TopicPoll topicPoll, User voter);
+     List<TopicVote> findByTopicPollIdAndVoterId(Long topicPoll, Long voter);
 }

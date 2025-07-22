@@ -10,5 +10,5 @@ public interface PollService {
     public List<PollDTO> getAll();
     public void updatePollStatus(PollDTO poll);
     public PollDTO createPoll(long meetingId);
-    public boolean checkVoteAbility(long poll, long userId);
+    public boolean checkVoteAbility(long pollid, long userId);
 }
