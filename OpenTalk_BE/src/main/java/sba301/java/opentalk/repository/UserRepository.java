@@ -88,5 +88,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
          AND u.companyBranch = :companyBranch
     """)
     Page<User> findByEmailAndIsEnabledAndCompanyBranch(String email, Boolean isEnabled, CompanyBranch companyBranch, Pageable pageable);
+    @Query("""
+      SELECT u
+        FROM User u
+       WHERE (:isEnabled   IS NULL OR u.isEnabled   = :isEnabled)
+         AND (:companyBranch IS NULL OR u.companyBranch = :companyBranch)
+    """)
+    List<User> findByIsEnabledAndCompanyBranch(Boolean isEnabled, CompanyBranch companyBranch);
 
 }
