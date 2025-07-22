@@ -6,7 +6,8 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "topic_vote")
+@Table(name = "topic_vote",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "topic_poll_id"}))
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -46,8 +46,7 @@ public class TopicVoteServiceImpl implements TopicVoteService {
     @Override
     public List<TopicVoteResultResponse> getResultPoll(long pollId) {
         List<TopicVoteResultResponse> resultPoll = new ArrayList<>();
-        Poll poll = pollRepository.findById((int)pollId).orElse(null);
-        List<TopicPoll> topicPollList = topicPollRepository.findByPoll(poll);
+        List<TopicPoll> topicPollList = topicPollRepository.findByPollId(pollId);
         for(TopicPoll topicPoll : topicPollList) {
             TopicVoteResultResponse resultPollResponse = new TopicVoteResultResponse();
             resultPollResponse.setTopicPollId(topicPoll.getId());

@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
         if (isEnable == null ||companyBranch == null ) {
             page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, null, null, pageable);
         }else{
-            CompanyBranch company= companyBranchRepository.findById((long)companyBranch).get();
+            CompanyBranch company= companyBranchRepository.findById(companyBranch).get();
             page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, isEnable, company, pageable);
         }
         return page.map(EmployeeMapper.INSTANCE::toDto);
