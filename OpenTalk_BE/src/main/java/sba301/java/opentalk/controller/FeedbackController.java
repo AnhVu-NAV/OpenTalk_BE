@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sba301.java.opentalk.dto.FeedbackDTO;
+import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.service.FeedbackService;
 
 import java.util.List;
@@ -29,8 +30,12 @@ public class FeedbackController {
     }
 
     @PostMapping
-    public ResponseEntity<FeedbackDTO> createFeedback(@RequestBody FeedbackDTO feedbackDTO) {
-        return ResponseEntity.ok(feedbackService.createFeedback(feedbackDTO));
+    public ResponseEntity<Void> createFeedback(@RequestBody FeedbackDTO feedbackDTO) throws AppException {
+        if (feedbackDTO.getUser() == null || feedbackDTO.getMeeting() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        feedbackService.createFeedback(feedbackDTO);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{feedbackId}")

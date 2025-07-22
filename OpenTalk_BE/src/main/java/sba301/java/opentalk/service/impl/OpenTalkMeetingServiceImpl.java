@@ -295,12 +295,12 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                 meeting.getTopic().getDescription(),
                 meeting.getTopic().getRemark(),
                 new OpenTalkMeetingDetailDTO.UserDTO(
-                        meeting.getTopic().getSuggestedBy().getAvatarUrl(),
-                        meeting.getTopic().getSuggestedBy().getUsername(),
-                        meeting.getTopic().getSuggestedBy().getEmail(),
-                        meeting.getTopic().getSuggestedBy().getFullName(),
+                        meeting.getTopic().getSuggestedBy() != null ? meeting.getTopic().getSuggestedBy().getAvatarUrl() : null,
+                        meeting.getTopic().getSuggestedBy() != null ? meeting.getTopic().getSuggestedBy().getUsername() : null,
+                        meeting.getTopic().getSuggestedBy() != null ? meeting.getTopic().getSuggestedBy().getEmail() : null,
+                        meeting.getTopic().getSuggestedBy() != null ? meeting.getTopic().getSuggestedBy().getFullName() : null,
                         new OpenTalkMeetingDetailDTO.CompanyBranchDTO(
-                                meeting.getTopic().getSuggestedBy().getCompanyBranch().getName()
+                                meeting.getTopic().getSuggestedBy() != null ? meeting.getTopic().getSuggestedBy().getCompanyBranch().getName() : null
                         )
                 ),
                 new OpenTalkMeetingDetailDTO.UserDTO(
