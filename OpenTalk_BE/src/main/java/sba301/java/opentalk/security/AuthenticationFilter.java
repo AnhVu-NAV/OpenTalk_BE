@@ -27,9 +27,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private final RedisService redisService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         if (isBypassToken(request)) {
             filterChain.doFilter(request, response);
@@ -71,7 +69,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/swagger-ui/") ||
                 path.startsWith("/v3/api-docs") ||
                 path.equals("/swagger-ui.html") ||
-                path.startsWith("/api/health-check/") ||
-                path.startsWith("/api/files/");
+                path.startsWith("/api/health-check/");
     }
 }

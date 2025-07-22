@@ -23,6 +23,7 @@ public class OpenTalkMeetingDetailDTO extends BaseDTO {
     private UserDTO host;
     private List<Long> registeredHostUserIds;
     private CompanyBranchDTO companyBranch;
+    private Integer avgRating;
 
     @Getter
     @Setter

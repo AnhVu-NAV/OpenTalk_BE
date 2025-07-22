@@ -38,4 +38,9 @@ public class AttendanceController {
             @RequestParam Long userId) {
         return ResponseEntity.ok(attendanceService.isCheckin(meetingId, userId) ? CheckinStatus.ALREADY_CHECKED_IN.toString() : CheckinStatus.NOT_CHECKED_IN.toString());
     }
+
+    @GetMapping("/checkin-code")
+    public ResponseEntity<CheckinCodeGenerateResponse> getCheckinCode(@RequestParam Long meetingId) {
+        return ResponseEntity.ok(attendanceService.getCheckinCode(meetingId));
+    }
 }

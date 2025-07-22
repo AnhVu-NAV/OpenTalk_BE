@@ -59,6 +59,16 @@ public class OpenTalkMeetingController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/details-for-host")
+    public ResponseEntity<List<OpenTalkMeetingDetailDTO>> getMeetingDetailsForHost(
+            @RequestParam(required = false, defaultValue = "") String meetingName,
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false, defaultValue = "") String username
+    ) {
+        return ResponseEntity.ok(
+                openTalkMeetingService.getOpenTalkMeetingWithDetailsForHost(meetingName, branchId, username));
+    }
+
     @GetMapping("/{userId}/registered")
     public ResponseEntity<Page<OpenTalkMeetingDTO>> getRegisteredOpenTalks(
             @PathVariable Long userId,
@@ -110,7 +120,6 @@ public class OpenTalkMeetingController {
     @PostMapping("/admin/{openTalkMeetingId}/register")
     public ResponseEntity<OpenTalkMeetingDTO> registerOpenTalkMeetingByAdmin(@RequestBody HostRegistrationDTO registrationDTO) {
         registrationDTO.setStatus(HostRegistrationStatus.APPROVED);
-//        Locale locale = LocaleContextHolder.getLocale();
         hostRegistrationService.registerOpenTalk(registrationDTO);
         return ResponseEntity.ok().build();
     }
@@ -133,7 +142,7 @@ public class OpenTalkMeetingController {
     }
 
     @GetMapping("/{openTalkMeetingId}")
-    public OpenTalkMeetingDTO getMeetingByID(@PathVariable Long openTalkMeetingId) {
+    public OpenTalkMeetingDTO getMeetingById(@PathVariable Long openTalkMeetingId) {
         return openTalkMeetingService.findMeetingById(openTalkMeetingId);
     }
 

@@ -37,57 +37,29 @@ public class SecurityConfiguration {
                                 "/api/files/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/company-branch/**")
-                        .hasAnyRole("ADMIN", "USER")
-
-                        .requestMatchers(HttpMethod.POST, "/api/company-branch/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.PUT, "/api/company-branch/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.DELETE, "/api/company-branch/**")
-                        .hasRole("ADMIN").
-
-                        requestMatchers(HttpMethod.DELETE, "/api/poll/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers("/api/topic-vote/**")
-                        .hasAnyRole("ADMIN", "USER")
-
-                        .requestMatchers("/api/topic-idea/suggestedBy/**")
-                        .hasAnyRole("ADMIN", "USER")
-
-                        .requestMatchers("/api/opentalk-meeting/**")
-                        .hasAnyRole("USER", "ADMIN")
-
-                        .requestMatchers("/api/topic-idea/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers("/api/opentalk-meeting/**")
-                        .hasRole("USER").
-
-                        requestMatchers("/api/topic-poll/**")
-                        .hasAnyRole("ADMIN", "USER")
-
-                        .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/api/attendance/checkin")
-                        .hasRole("USER")
-
-                        .requestMatchers(HttpMethod.GET, "/api/attendance/checkin-status")
-                        .hasRole("USER")
-
-                        .requestMatchers(
-                                "/api/users",
-                                "/api/opentalk-topic",
-                                "/api/opentalk-meeting",
-                                "/api/cron",
-                                "/api/health-check",
-                                "/api/company-branch/**",
-                                "/api/hr/**")
-                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/company-branch/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/company-branch/**").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/attendance/generate-checkin-code").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/attendance/checkin-code").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/attendance/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/feedbacks/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/files/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/files/**").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/api/poll/**").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/poll/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea/admin/status").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/topic-idea/admin/decision").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea/suggestedBy/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea/{id}").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.POST, "/api/topic-idea").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/topic-idea").hasRole("MEETING_MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/api/topic-idea").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/topic-idea/{id}").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/topic-poll/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/topic-vote/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/opentalk-meeting/**").hasAnyRole("USER", "MEETING_MANAGER")
+                        .requestMatchers("/api/hr/**").hasRole("HR")
+                        .requestMatchers("/api/salaries/**").hasRole("HR")
 
                         .anyRequest()
                         .authenticated())

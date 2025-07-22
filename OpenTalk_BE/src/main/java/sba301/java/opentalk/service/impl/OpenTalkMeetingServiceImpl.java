@@ -26,6 +26,7 @@ import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.model.response.OpenTalkMeetingWithStatusDTO;
 import sba301.java.opentalk.repository.AttendanceRepository;
+import sba301.java.opentalk.repository.FeedbackRepository;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.service.HostRegistrationService;
@@ -36,12 +37,12 @@ import sba301.java.opentalk.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,6 +60,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     private final MailService mailService;
     private final HostRegistrationRepository hostRegistrationRepository;
     private final AttendanceRepository attendanceRepository;
+    private final FeedbackRepository feedbackRepository;
 
     @Override
     public OpenTalkMeetingDTO createMeeting(OpenTalkMeetingDTO topic) {
@@ -149,8 +151,19 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                             new OpenTalkMeetingDetailDTO.CompanyBranchDTO(u.getCompanyBranch().getName())
                     )).orElse(null);
             meetingDetail.setHost(userHost);
+            if (Objects.equals(meetingDetail.getStatus(), String.valueOf(MeetingStatus.COMPLETED))) {
+                Double avg = feedbackRepository.calculateAverageRateByMeetingId(meetingDetail.getId());
+                meetingDetail.setAvgRating(avg != null ? (int) Math.round(avg) : null);
+            }
         });
         return meetingDetails;
+    }
+
+    @Override
+    public List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetailsForHost(String meetingName, Long branchId, String username) {
+        return this.getOpenTalkMeetingWithDetails(meetingName, branchId).stream()
+                .filter(meeting -> meeting.getHost() != null && meeting.getHost().getUsername().equals(username))
+                .toList();
     }
 
     @Override

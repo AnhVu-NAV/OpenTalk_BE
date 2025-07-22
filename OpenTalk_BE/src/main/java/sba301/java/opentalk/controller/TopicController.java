@@ -4,7 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import sba301.java.opentalk.dto.TopicDTO;
 import sba301.java.opentalk.enums.TopicStatus;
 import sba301.java.opentalk.model.request.DecisionRequest;
@@ -27,11 +35,13 @@ public class TopicController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     //USER AND ADMIN FUNCTION
     @GetMapping("/suggestedBy/{id}")
     public List<TopicDTO> getTopicByUser(@PathVariable long id) {
         return topicService.getTopicsByUser(id);
     }
+
     //ADMIN FUNCTION
     @GetMapping("/admin/status")
     public List<String> getStatus() {
@@ -41,11 +51,11 @@ public class TopicController {
     }
 
     //ADMIN FUNCTION
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<Page<TopicDTO>> getAllTopics(@RequestParam(defaultValue = "1") int pageNo,
-                                                        @RequestParam(defaultValue = "8") int pageSize,
-                                                        @RequestParam(defaultValue = "") String status,
-                                                       @RequestParam(defaultValue = "") String title ) {
+                                                       @RequestParam(defaultValue = "8") int pageSize,
+                                                       @RequestParam(defaultValue = "") String status,
+                                                       @RequestParam(defaultValue = "") String title) {
         Page<TopicDTO> page = topicService.findByStatusAndTitle(status, PageRequest.of(pageNo - 1, pageSize), title);
         return ResponseEntity.ok(page);
     }
@@ -53,11 +63,11 @@ public class TopicController {
     //USER AND ADMIN FUNCTION
     @PostMapping()
     public ResponseEntity<TopicDTO> addTopic(@RequestBody TopicDTO dto) {
-            topicService.addTopic(dto);
+        topicService.addTopic(dto);
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<TopicDTO> updateTopic(
             @RequestBody TopicDTO dto) {
         TopicDTO updated = topicService.updateTopic(dto);
@@ -69,6 +79,7 @@ public class TopicController {
         TopicDTO deleted = topicService.deleteTopic(id);
         return ResponseEntity.ok(deleted);
     }
+
     //ADMIN FUNCTION
     @PutMapping("/admin/decision")
     public ResponseEntity<TopicDTO> decision(@RequestBody DecisionRequest decisionRequest) {

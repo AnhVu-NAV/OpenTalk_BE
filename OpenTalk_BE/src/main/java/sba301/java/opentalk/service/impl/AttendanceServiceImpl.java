@@ -17,7 +17,9 @@ import sba301.java.opentalk.service.AttendanceService;
 import sba301.java.opentalk.service.RedisService;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +62,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public String submitCheckin(CheckinRequest checkinRequest) throws AppException {
-        String redisKey = "checkin_code" + checkinRequest.getCheckinCode();
+        String redisKey = CHECKIN_CODE + checkinRequest.getCheckinCode();
         String meetingIdStr = redisService.get(redisKey);
 
         if (meetingIdStr == null) {
@@ -85,5 +87,26 @@ public class AttendanceServiceImpl implements AttendanceService {
         attendanceRepository.save(attendance);
 
         return CheckinStatus.SUCCESS.toString();
+    }
+
+    @Override
+    public CheckinCodeGenerateResponse getCheckinCode(Long meetingId) {
+        List<String> keys = redisService.getKeysByPattern("checkin_code:*");
+        for (String key : keys) {
+            String value = redisService.get(key);
+            long ttlInSeconds = redisService.getRemainingTtl(key);
+            LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(ttlInSeconds);
+            if (String.valueOf(meetingId).equals(value)) {
+                return new CheckinCodeGenerateResponse(key.replace("checkin_code:", ""), expiresAt);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Integer countAttendanceByUserIdAndValidTime(Long userId, LocalDate dateFrom, LocalDate dateTo) {
+        LocalDateTime start = dateFrom.atStartOfDay();
+        LocalDateTime end = dateTo.plusDays(1).atStartOfDay();
+        return attendanceRepository.countAttendanceByUserIdAndCreatedAtBetween(userId, start, end);
     }
 }
