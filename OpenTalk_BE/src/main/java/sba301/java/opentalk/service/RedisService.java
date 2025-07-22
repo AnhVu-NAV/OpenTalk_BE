@@ -1,5 +1,7 @@
 package sba301.java.opentalk.service;
 
+import java.util.List;
+
 public interface RedisService {
     String get(String key);
 
@@ -30,4 +32,7 @@ public interface RedisService {
     void savePollScheduleCron(long pollId, String cronExpression);
 
     void saveKeyWithTTL(String key, String value, long ttlSeconds);
+
+    List<String> getKeysByPattern(String pattern);
+
 }
