@@ -37,41 +37,36 @@ public class SecurityConfiguration {
                                 "/api/files/**")
                         .permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/company-branch/**")
-                        .hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.GET, "/api/company-branch/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/company-branch/**").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/attendance/generate-checkin-code").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/attendance/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/feedbacks/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/files/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/files/**").hasRole("MEETING_MANAGER")
 
-                        .requestMatchers(HttpMethod.POST, "/api/company-branch/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.PUT, "/api/company-branch/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.DELETE, "/api/company-branch/**")
-                        .hasRole("ADMIN").
-
-                        requestMatchers(HttpMethod.DELETE, "/api/poll/**")
-                        .hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/poll/**").hasRole("MEETING_MANAGER")
 
                         .requestMatchers("/api/topic-vote/**")
-                        .hasAnyRole("ADMIN", "USER")
+                        .hasAnyRole("MEETING_MANAGER", "USER")
 
                         .requestMatchers("/api/topic-idea/suggestedBy/**")
-                        .hasAnyRole("ADMIN", "USER")
+                        .hasAnyRole("MEETING_MANAGER", "USER")
 
                         .requestMatchers("/api/opentalk-meeting/**")
-                        .hasAnyRole("USER", "ADMIN")
+                        .hasAnyRole("USER", "MEETING_MANAGER")
 
                         .requestMatchers("/api/topic-idea/**")
-                        .hasRole("ADMIN")
+                        .hasRole("MEETING_MANAGER")
 
                         .requestMatchers("/api/opentalk-meeting/**")
                         .hasRole("USER").
 
                         requestMatchers("/api/topic-poll/**")
-                        .hasAnyRole("ADMIN", "USER")
+                        .hasAnyRole("MEETING_MANAGER", "USER")
 
                         .requestMatchers(HttpMethod.POST, "/api/attendance/generate-checkin-code")
-                        .hasRole("ADMIN")
+                        .hasRole("MEETING_MANAGER")
 
                         .requestMatchers(HttpMethod.POST, "/api/attendance/checkin")
                         .hasRole("USER")
