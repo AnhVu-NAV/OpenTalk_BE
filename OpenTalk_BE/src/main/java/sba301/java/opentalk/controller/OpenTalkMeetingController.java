@@ -120,7 +120,6 @@ public class OpenTalkMeetingController {
     @PostMapping("/admin/{openTalkMeetingId}/register")
     public ResponseEntity<OpenTalkMeetingDTO> registerOpenTalkMeetingByAdmin(@RequestBody HostRegistrationDTO registrationDTO) {
         registrationDTO.setStatus(HostRegistrationStatus.APPROVED);
-//        Locale locale = LocaleContextHolder.getLocale();
         hostRegistrationService.registerOpenTalk(registrationDTO);
         return ResponseEntity.ok().build();
     }
@@ -143,7 +142,7 @@ public class OpenTalkMeetingController {
     }
 
     @GetMapping("/{openTalkMeetingId}")
-    public OpenTalkMeetingDTO getMeetingByID(@PathVariable Long openTalkMeetingId) {
+    public OpenTalkMeetingDTO getMeetingById(@PathVariable Long openTalkMeetingId) {
         return openTalkMeetingService.findMeetingById(openTalkMeetingId);
     }
 
