@@ -84,8 +84,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
       SELECT u
         FROM User u
        WHERE u.email LIKE CONCAT('%', :email, '%')
-         AND u.isEnabled = :isEnabled
-         AND u.companyBranch = :companyBranch
+         AND (:isEnabled   IS NULL OR u.isEnabled   = :isEnabled)
+         AND (:companyBranch IS NULL OR u.companyBranch = :companyBranch)
     """)
     Page<User> findByEmailAndIsEnabledAndCompanyBranch(String email, Boolean isEnabled, CompanyBranch companyBranch, Pageable pageable);
     @Query("""
