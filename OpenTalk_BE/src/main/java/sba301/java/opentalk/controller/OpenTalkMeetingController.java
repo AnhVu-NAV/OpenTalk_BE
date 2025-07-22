@@ -59,6 +59,16 @@ public class OpenTalkMeetingController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/details-for-host")
+    public ResponseEntity<List<OpenTalkMeetingDetailDTO>> getMeetingDetailsForHost(
+            @RequestParam(required = false, defaultValue = "") String meetingName,
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false, defaultValue = "") String username
+    ) {
+        return ResponseEntity.ok(
+                openTalkMeetingService.getOpenTalkMeetingWithDetailsForHost(meetingName, branchId, username));
+    }
+
     @GetMapping("/{userId}/registered")
     public ResponseEntity<Page<OpenTalkMeetingDTO>> getRegisteredOpenTalks(
             @PathVariable Long userId,

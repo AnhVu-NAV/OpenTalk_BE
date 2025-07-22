@@ -160,6 +160,13 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     }
 
     @Override
+    public List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetailsForHost(String meetingName, Long branchId, String username) {
+        return this.getOpenTalkMeetingWithDetails(meetingName, branchId).stream()
+                .filter(meeting -> meeting.getHost() != null && meeting.getHost().getUsername().equals(username))
+                .toList();
+    }
+
+    @Override
     public Page<OpenTalkMeetingDTO> getMeetingsCompleted(OpenTalkCompletedRequest request) {
         return meetingRepository.findCompletedOpenTalks(
                         request.getCompanyBranchId(), request.getHostName(),

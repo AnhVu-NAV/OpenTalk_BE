@@ -21,6 +21,8 @@ public interface OpenTalkMeetingService {
 
     List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetails(String meetingName, Long branchId);
 
+    List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetailsForHost(String meetingName, Long branchId, String username);
+
     Page<OpenTalkMeetingDTO> getMeetingsCompleted(OpenTalkCompletedRequest request);
 
     Page<OpenTalkMeetingDTO> getRegisteredOpenTalks(Long userId, LocalDate startDate, LocalDate endDate, int page, int pageSize);
