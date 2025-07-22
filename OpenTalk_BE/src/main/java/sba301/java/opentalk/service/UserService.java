@@ -1,5 +1,6 @@
 package sba301.java.opentalk.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import sba301.java.opentalk.dto.EmployeeDTO;
@@ -8,6 +9,7 @@ import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import org.springframework.data.domain.Slice;
+import sba301.java.opentalk.model.response.EmployeeExportDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,9 +41,12 @@ public interface UserService {
 
     public void generateRandom();
 
-    Page<EmployeeDTO> findEmployees(String email, boolean isEnable, int companyBranchId, Pageable pageable);
+    Page<EmployeeDTO> findEmployees(String email, Boolean isEnable, int companyBranchId, Pageable pageable);
 
     EmployeeDTO createUser(EmployeeDTO dto);
 
     EmployeeDTO updateEmployee(Long userId, EmployeeDTO dto);
+
+    List<EmployeeExportDTO> exportEmployeeList(Boolean isEnable, Long companyBranchId, HttpServletResponse response) throws AppException;
+
 }

@@ -1,14 +1,16 @@
 package sba301.java.opentalk.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sba301.java.opentalk.dto.EmployeeDTO;
-import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.service.UserService;
+import sba301.java.opentalk.model.response.EmployeeExportDTO;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/hr")
@@ -22,10 +24,15 @@ public class HRController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "") String email,
-            @RequestParam(defaultValue = "") boolean isEnable,
-            @RequestParam(defaultValue = "") int companyBranchId
+            @RequestParam(required = false) Boolean isEnable,
+            @RequestParam(defaultValue = "2") int companyBranchId
     ) {
-        Page<EmployeeDTO> employees = userService.findEmployees(email, isEnable, companyBranchId,PageRequest.of(page, size));
+        Page<EmployeeDTO> employees = null;
+        if (isEnable == null) {
+            employees = userService.findEmployees(email, true, companyBranchId,PageRequest.of(page, size));
+        }else{
+            employees = userService.findEmployees(email, isEnable, companyBranchId,PageRequest.of(page, size));
+        }
         return ResponseEntity.ok(employees);
     }
 
@@ -51,5 +58,12 @@ public class HRController {
     public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody EmployeeDTO dto) {
         EmployeeDTO created = userService.createUser(dto);
         return ResponseEntity.ok(created);
+    }
+
+    @GetMapping("/export/")
+    public void exportEmployees(@RequestParam(required = false) Boolean status,
+                                                                   @RequestParam(required = false) Long companyBranchId,
+                                                                   HttpServletResponse response) throws AppException {
+        List<EmployeeExportDTO> resutl = userService.exportEmployeeList(status, companyBranchId, response);
     }
 }
