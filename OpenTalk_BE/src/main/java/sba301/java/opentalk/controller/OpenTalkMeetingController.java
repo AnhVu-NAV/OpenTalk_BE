@@ -164,4 +164,9 @@ public class OpenTalkMeetingController {
     ) {
         return ResponseEntity.ok(openTalkMeetingService.getRecentMeetingsWithStatusAttendance(userId, companyBranchId));
     }
+    @PutMapping("/status/{id}")
+    public ResponseEntity<OpenTalkMeetingDTO> updateMeetingStatus(@PathVariable Long id) {
+        OpenTalkMeetingDTO openTalkMeetingDTO =  openTalkMeetingService.updateStatusAfterCreatePoll(id);
+        return ResponseEntity.ok(openTalkMeetingDTO);
+    }
 }

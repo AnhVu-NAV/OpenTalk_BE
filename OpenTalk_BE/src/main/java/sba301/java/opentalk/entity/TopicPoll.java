@@ -7,7 +7,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "topic_poll")
+@Table(name = "topic_poll", uniqueConstraints = @UniqueConstraint(columnNames = {"poll_id", "topic_id"}))
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

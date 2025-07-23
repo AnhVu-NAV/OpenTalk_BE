@@ -23,9 +23,10 @@ public class TopicPollController {
     }
 
     @PostMapping
-    public ResponseEntity<TopicPollDTO> createNewTopicPoll(@RequestBody TopicPollDTO topicPollDTO) {
-        topicPollService.createTopicPoll(topicPollDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> createNewTopicPoll(@RequestParam(required = false) long topicId,
+                                                      @RequestParam(required = false) long pollId) {
+        Boolean result = topicPollService.createTopicPoll(topicId,  pollId);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{pollId}")
@@ -37,6 +38,12 @@ public class TopicPollController {
     public PollDTO getPollById(@PathVariable("id") int id) {
         return pollService.findById(id);
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteTopicPoll(@PathVariable int id) {
+        return topicPollService.deleteTopicPoll(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    }
+
 
 
 }
