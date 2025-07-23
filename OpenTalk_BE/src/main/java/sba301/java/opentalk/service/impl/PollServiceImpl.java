@@ -63,8 +63,9 @@ public class PollServiceImpl implements PollService {
             );
             TopicPoll topicPoll = maxEntry.getKey();
             openTalkMeetingDTO.setTopic(TopicMapper.INSTANCE.toDto(topicPoll.getTopic()));
-            openTalkMeetingRepository.save(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
             poll.setEnabled(false);
+            poll.setOpenTalkMeeting(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
+            pollRepository.save(poll);
         }
     }
 
