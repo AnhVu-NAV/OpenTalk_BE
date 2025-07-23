@@ -84,19 +84,21 @@ public class PollServiceImpl implements PollService {
         Poll poll = new Poll();
         poll.setOpenTalkMeeting(openTalkMeeting);
         poll.setEnabled(true);
+        pollRepository.save(poll);
         return PollMapper.INSTANCE.toDto(poll);
     }
 
     @Override
     public boolean checkVoteAbility(long pollid, long userId) {
         List<TopicPoll> listAnswer = topicPollRepository.findByPollId(pollid);
-        for (TopicPoll topicPoll : listAnswer) {
+        Poll poll = pollRepository.findById((int)pollid).get();
+        for(TopicPoll topicPoll : listAnswer) {
             List<TopicVote> topicVote = topicVoteRepository.findByTopicPollIdAndVoterId(topicPoll.getId(), userId);
             if (!topicVote.isEmpty()) {
                 return false;
             }
         }
-        return true;
+        return poll.isEnabled();
     }
 
 

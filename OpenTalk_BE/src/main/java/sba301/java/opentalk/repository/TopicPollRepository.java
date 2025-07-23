@@ -12,5 +12,6 @@ import java.util.List;
 public interface TopicPollRepository extends JpaRepository<TopicPoll, Long> {
     List<TopicPoll>  findByPollId(Long id);
     List<TopicPoll> findByPoll(Poll poll);
+    boolean existsByPollIdAndTopicId(long pollId, long topicId);
 
 }

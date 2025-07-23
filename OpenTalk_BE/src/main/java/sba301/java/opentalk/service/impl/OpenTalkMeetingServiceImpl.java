@@ -387,6 +387,14 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                 endDateTime.getYear());
     }
 
+    @Override
+    public OpenTalkMeetingDTO updateStatusAfterCreatePoll(Long id) {
+        OpenTalkMeeting meeting = openTalkMeetingRepository.findById(id).get();
+        meeting.setStatus(MeetingStatus.WAITING_HOST_REGISTER);
+        openTalkMeetingRepository.save(meeting);
+        return OpenTalkMeetingMapper.INSTANCE.toDto(meeting);
+    }
+
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {
         OpenTalkMeetingDetailDTO detail = new OpenTalkMeetingDetailDTO();
         detail.setId(meeting.getId());

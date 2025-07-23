@@ -53,4 +53,6 @@ public interface OpenTalkMeetingService {
     void scheduleMeetingStatusUpdate(OpenTalkMeeting openTalkMeeting);
 
     void updateMeetingStatus(Long meetingId, String jobType);
+
+    OpenTalkMeetingDTO updateStatusAfterCreatePoll(Long id);
 }
