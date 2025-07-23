@@ -81,13 +81,14 @@ public class PollServiceImpl implements PollService {
     @Override
     public boolean checkVoteAbility(long pollid, long userId) {
         List<TopicPoll> listAnswer = topicPollRepository.findByPollId(pollid);
+        Poll poll = pollRepository.findById((int)pollid).get();
         for(TopicPoll topicPoll : listAnswer) {
             List<TopicVote> topicVote = topicVoteRepository.findByTopicPollIdAndVoterId(topicPoll.getId(), userId);
             if(!topicVote.isEmpty()) {
                 return false;
             }
         }
-        return true;
+        return poll.isEnabled();
     }
 
 
