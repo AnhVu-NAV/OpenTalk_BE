@@ -1,17 +1,23 @@
 package sba301.java.opentalk.service.impl;
 
-import sba301.java.opentalk.model.Mail.Mail;
-import sba301.java.opentalk.service.MailService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
+import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.enums.MailType;
+import sba301.java.opentalk.model.Mail.Mail;
+import sba301.java.opentalk.model.Mail.MailSubjectFactory;
+import sba301.java.opentalk.service.MailService;
+import sba301.java.opentalk.service.UserService;
 
 @Service
+@RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+    private final UserService userService;
 
     @Value("${spring.mail.username}")
     private String defaultMailFrom;
@@ -26,5 +32,14 @@ public class MailServiceImpl implements MailService {
         message.setText(mail.getMailContent());
 
         mailSender.send(message);
+    }
+
+    @Override
+    public void sendMailUpdateInfoMeetingForMeetingManager(OpenTalkMeetingDTO openTalkMeetingDTO) {
+        Mail mail = new Mail();
+        mail.setMailTo(userService.getAllMeetingManagers().stream().map(UserDTO::getEmail).toArray(String[]::new));
+        mail.setMailSubject(MailSubjectFactory.getMailSubject(MailType.REMIND).toString());
+        mail.setMailContent("Please update information and choose topic vote for Meeting: " + openTalkMeetingDTO.getMeetingName());
+        this.sendMail(mail);
     }
 }

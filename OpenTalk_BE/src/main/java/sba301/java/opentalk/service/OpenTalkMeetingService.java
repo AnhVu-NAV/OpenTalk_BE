@@ -44,4 +44,6 @@ public interface OpenTalkMeetingService {
     List<OpenTalkMeetingDTO> getMeetingsByCheckinCodesInRedis();
 
     List<OpenTalkMeetingWithStatusDTO> getRecentMeetingsWithStatusAttendance(Long userId, Long companyBranchId);
+
+    void createEmptyOpenTalk();
 }

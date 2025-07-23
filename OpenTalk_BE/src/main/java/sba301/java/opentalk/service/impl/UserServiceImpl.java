@@ -70,6 +70,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserDTO> getAllMeetingManagers() {
+        return userRepository.findAllByRoleName("MEETING_MANAGER").stream().map(UserMapper.INSTANCE::userToUserDTO).toList();
+    }
+
+    @Override
     public UserDTO getUserById(Long userId) throws AppException {
         log.info("Miss at cache. Call to database.");
         return userRepository.findById(userId)

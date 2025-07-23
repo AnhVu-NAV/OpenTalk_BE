@@ -26,6 +26,7 @@ import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.model.response.OpenTalkMeetingWithStatusDTO;
 import sba301.java.opentalk.repository.AttendanceRepository;
+import sba301.java.opentalk.repository.CompanyBranchRepository;
 import sba301.java.opentalk.repository.FeedbackRepository;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
@@ -39,6 +40,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +63,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     private final HostRegistrationRepository hostRegistrationRepository;
     private final AttendanceRepository attendanceRepository;
     private final FeedbackRepository feedbackRepository;
+    private final CompanyBranchRepository companyBranchRepository;
 
     @Override
     public OpenTalkMeetingDTO createMeeting(OpenTalkMeetingDTO topic) {
@@ -293,6 +296,21 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
                     return new OpenTalkMeetingWithStatusDTO(meeting, attended);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void createEmptyOpenTalk() {
+        LocalDateTime scheduledDate = LocalDateTime.now().plusDays(redisService.getDaysUntilOpenTalk());
+        companyBranchRepository.findAll().forEach(companyBranch -> {
+            OpenTalkMeeting openTalkMeeting = new OpenTalkMeeting();
+            openTalkMeeting.setMeetingName("Opentalk Meeting at " + scheduledDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")));
+            openTalkMeeting.setStatus(MeetingStatus.WAITING_TOPIC);
+            openTalkMeeting.setScheduledDate(scheduledDate);
+            openTalkMeeting.setCompanyBranch(companyBranch);
+            openTalkMeeting.setDuration(2);
+            openTalkMeetingRepository.save(openTalkMeeting);
+            mailService.sendMailUpdateInfoMeetingForMeetingManager(OpenTalkMeetingMapper.INSTANCE.toDto(openTalkMeeting));
+        });
     }
 
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {

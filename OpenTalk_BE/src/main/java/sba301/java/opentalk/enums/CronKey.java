@@ -1,6 +1,7 @@
 package sba301.java.opentalk.enums;
 
 import sba301.java.opentalk.common.CheckPollStatus;
+import sba301.java.opentalk.common.CreateMeeting;
 import sba301.java.opentalk.common.RandomHostSelectionJob;
 import sba301.java.opentalk.common.SyncDataUserFromHRM;
 
@@ -16,6 +17,12 @@ public enum CronKey {
             "updatePollStatusTrigger",
             CheckPollStatus.class,
             "0 0 0 ? * TUE"
+    ),
+    CREATE_MEETING(
+            "createMeeting",
+            "createMeetingTrigger",
+            CreateMeeting.class,
+            "0 0 0 ? * MON"
     ),
     SYNC(
             "syncJob",

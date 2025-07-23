@@ -3,12 +3,12 @@ package sba301.java.opentalk.service;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import sba301.java.opentalk.dto.EmployeeDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
-import org.springframework.data.domain.Slice;
 import sba301.java.opentalk.model.response.EmployeeExportDTO;
 
 import java.util.List;
@@ -20,6 +20,8 @@ public interface UserService {
     List<UserDTO> getUsers();
 
     List<UserDTO> getAllAdmin();
+
+    List<UserDTO> getAllMeetingManagers();
 
     UserDTO getUserById(Long userId) throws AppException;
 
