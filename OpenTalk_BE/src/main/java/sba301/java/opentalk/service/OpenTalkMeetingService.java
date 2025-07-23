@@ -45,5 +45,7 @@ public interface OpenTalkMeetingService {
 
     List<OpenTalkMeetingWithStatusDTO> getRecentMeetingsWithStatusAttendance(Long userId, Long companyBranchId);
 
+    void createEmptyOpenTalk();
+
     OpenTalkMeetingDTO updateStatusAfterCreatePoll(Long id);
 }
