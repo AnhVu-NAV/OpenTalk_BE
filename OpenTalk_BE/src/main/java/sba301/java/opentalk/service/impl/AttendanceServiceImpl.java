@@ -97,7 +97,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public CheckinCodeGenerateResponse getCheckinCode(Long meetingId) {
-        List<String> keys = redisService.getKeysByPattern("checkin_code:*");
+        List<String> keys = redisService.getKeysByPattern("checkin_code*");
         for (String key : keys) {
             String value = redisService.get(key);
             long ttlInSeconds = redisService.getRemainingTtl(key);
