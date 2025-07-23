@@ -40,7 +40,7 @@ public class OpenTalkMeeting extends BaseEntity {
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User host;
 

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sba301.java.opentalk.dto.AttendanceSummaryDTO;
 import sba301.java.opentalk.dto.UserAttendanceDTO;
+import org.springframework.web.bind.annotation.*;
 import sba301.java.opentalk.enums.CheckinStatus;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.model.request.CheckinRequest;
