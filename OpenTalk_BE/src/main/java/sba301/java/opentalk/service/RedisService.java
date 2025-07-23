@@ -15,23 +15,15 @@ public interface RedisService {
 
     boolean isRefreshTokenExpired(long userId);
 
-    void saveRandomDateCron(String cronExpression);
-
     String getRandomDateCron();
 
-    void saveDaysUntilOpenTalk(int daysUntilOpenTalk);
-
     int getDaysUntilOpenTalk();
-
-    void saveSyncDateCron(String cronExpression);
 
     String getSyncDateCron();
 
     void revokeToken(String accessToken, long ttl);
 
     boolean isTokenRevoked(String accessToken);
-
-    void savePollScheduleCron(long pollId, String cronExpression);
 
     void saveKeyWithTTL(String key, String value, long ttlSeconds);
 

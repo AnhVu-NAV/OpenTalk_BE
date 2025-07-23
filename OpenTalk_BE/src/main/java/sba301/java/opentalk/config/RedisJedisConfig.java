@@ -8,7 +8,6 @@ import redis.clients.jedis.Protocol;
 
 @Configuration
 public class RedisJedisConfig {
-
     @Bean
     public JedisPool jedisPool() {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
@@ -18,5 +17,4 @@ public class RedisJedisConfig {
         poolConfig.setJmxEnabled(false);
         return new JedisPool(poolConfig, "localhost", 6379, Protocol.DEFAULT_TIMEOUT);
     }
-
 }

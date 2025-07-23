@@ -1,87 +1,48 @@
 package sba301.java.opentalk.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
+import org.quartz.TriggerKey;
 import org.springframework.context.annotation.Configuration;
-import sba301.java.opentalk.common.CheckPollStatus;
-import sba301.java.opentalk.common.RandomHostSelectionJob;
-import sba301.java.opentalk.common.SyncDataUserFromHRM;
-import sba301.java.opentalk.service.RedisService;
+import sba301.java.opentalk.enums.CronKey;
+import sba301.java.opentalk.service.CronExpressionService;
 
 @Configuration
 @RequiredArgsConstructor
 public class QuartzConfig {
-    private final RedisService redisService;
 
-    @Bean
-    public JobDetail randomHostJobDetail() {
-        return JobBuilder.newJob(RandomHostSelectionJob.class)
-                .withIdentity("randomHostSelectionJob")
-                .storeDurably()
-                .build();
-    }
+    private final CronExpressionService cronService;
+    private final Scheduler scheduler;
 
-    @Bean
-    public JobDetail updatePollResultJobDetail() {
-        return JobBuilder.newJob(CheckPollStatus.class)
-                .withIdentity("checkPollStatus")
-                .storeDurably()
-                .build();
-    }
-
-    @Bean
-    public Trigger updatePollStatusTrigger(@Qualifier("updatePollResultJobDetail") JobDetail jobDetail) {
-        String cronExpression = redisService.getRandomDateCron();
-        if (cronExpression == null) {
-            cronExpression = "0 0 0 ? * TUE";
+    @PostConstruct
+    public void init() throws SchedulerException {
+        for (CronKey key : CronKey.values()) {
+            JobDetail jd = JobBuilder.newJob(key.getJobClass())
+                    .withIdentity(key.getJobName())
+                    .storeDurably()
+                    .build();
+            if (!scheduler.checkExists(jd.getKey())) {
+                scheduler.addJob(jd, false);
+            }
+            String expr = cronService.getCronExpression(key);
+            TriggerKey tk = TriggerKey.triggerKey(key.getTriggerName());
+            Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity(tk)
+                    .forJob(jd)
+                    .withSchedule(CronScheduleBuilder.cronSchedule(expr))
+                    .build();
+            if (scheduler.checkExists(tk)) {
+                scheduler.rescheduleJob(tk, trigger);
+            } else {
+                scheduler.scheduleJob(trigger);
+            }
         }
-
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail)
-                .withIdentity("updatePollStatusTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-                .build();
-    }
-
-    @Bean
-    public Trigger randomTrigger(@Qualifier("randomHostJobDetail") JobDetail jobDetail) {
-        String cronExpression = redisService.getRandomDateCron();
-        if (cronExpression == null) {
-            cronExpression = "0 0 10 ? * TUE";
-        }
-
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail)
-                .withIdentity("randomHostSelectionTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-                .build();
-    }
-
-    @Bean
-    public JobDetail syncDataJobDetail() {
-        return JobBuilder.newJob(SyncDataUserFromHRM.class)
-                .withIdentity("syncJob")
-                .storeDurably()
-                .build();
-    }
-
-    @Bean
-    public Trigger syncTrigger(@Qualifier("syncDataJobDetail") JobDetail jobDetail) {
-        String cronExpression = redisService.getSyncDateCron();
-        if (cronExpression == null) {
-            cronExpression = "59 34 14 * * ?";
-        }
-
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail)
-                .withIdentity("syncTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-                .build();
     }
 }

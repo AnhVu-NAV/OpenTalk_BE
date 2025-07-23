@@ -55,18 +55,8 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void saveRandomDateCron(String cronExpression) {
-        redisTemplate.opsForValue().set(CRON_KEY_RANDOM, cronExpression);
-    }
-
-    @Override
     public String getRandomDateCron() {
         return (String) redisTemplate.opsForValue().get(CRON_KEY_RANDOM);
-    }
-
-    @Override
-    public void saveDaysUntilOpenTalk(int daysUntilOpenTalk) {
-        redisTemplate.opsForValue().set(CRON_KEY_DAYS_UNTIL_OPENTALK, daysUntilOpenTalk);
     }
 
     @Override
@@ -76,11 +66,6 @@ public class RedisServiceImpl implements RedisService {
             return Integer.parseInt(value.toString());
         } else
             return 7;
-    }
-
-    @Override
-    public void saveSyncDateCron(String cronExpression) {
-        redisTemplate.opsForValue().set(CRON_KEY_SYNC, cronExpression);
     }
 
     @Override
@@ -97,11 +82,6 @@ public class RedisServiceImpl implements RedisService {
     public boolean isTokenRevoked(String accessToken) {
         String isRevoked = (String) redisTemplate.opsForValue().get(accessToken);
         return "true".equals(isRevoked);
-    }
-
-    @Override
-    public void savePollScheduleCron(long pollId, String cronExpression) {
-        redisTemplate.opsForValue().set(String.valueOf(pollId), cronExpression);
     }
 
     @Override

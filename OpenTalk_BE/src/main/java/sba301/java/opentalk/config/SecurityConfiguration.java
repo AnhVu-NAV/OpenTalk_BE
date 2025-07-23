@@ -34,7 +34,8 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/api/files/**")
+                                "/api/files/**",
+                                "/api/users/**")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/company-branch/**").hasAnyRole("MEETING_MANAGER", "USER")
