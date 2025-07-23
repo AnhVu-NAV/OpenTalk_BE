@@ -40,6 +40,7 @@ public class SecurityConfiguration {
 
                         .requestMatchers(HttpMethod.GET, "/api/company-branch/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/company-branch/**").hasRole("MEETING_MANAGER")
+                        .requestMatchers("/api/cron/**").hasRole("MEETING_MANAGER")
                         .requestMatchers("/api/attendance/generate-checkin-code").hasRole("MEETING_MANAGER")
                         .requestMatchers("/api/attendance/checkin-code").hasRole("MEETING_MANAGER")
                         .requestMatchers("/api/attendance/summary").hasRole("HR")
