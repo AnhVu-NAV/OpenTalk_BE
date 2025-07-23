@@ -5,18 +5,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.PollDTO;
-import sba301.java.opentalk.entity.*;
+import sba301.java.opentalk.entity.OpenTalkMeeting;
+import sba301.java.opentalk.entity.Poll;
+import sba301.java.opentalk.entity.TopicPoll;
+import sba301.java.opentalk.entity.TopicVote;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.PollMapper;
 import sba301.java.opentalk.mapper.TopicMapper;
-import java.util.Map;
+import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
+import sba301.java.opentalk.repository.PollRepository;
+import sba301.java.opentalk.repository.TopicPollRepository;
+import sba301.java.opentalk.repository.TopicVoteRepository;
+import sba301.java.opentalk.repository.UserRepository;
+import sba301.java.opentalk.service.PollService;
+
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
-import sba301.java.opentalk.repository.*;
-import sba301.java.opentalk.service.PollService;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +45,7 @@ public class PollServiceImpl implements PollService {
 
     @Override
     public PollDTO findById(long id) {
-        PollDTO dto = PollMapper.INSTANCE.toDto(pollRepository.findByOpenTalkMeetingId((int)id));
+        PollDTO dto = PollMapper.INSTANCE.toDto(pollRepository.findByOpenTalkMeetingId((int) id));
         return dto;
     }
 
@@ -49,8 +57,8 @@ public class PollServiceImpl implements PollService {
     @Override
     public void updatePollStatus(PollDTO pollDTO) {
         OpenTalkMeetingDTO openTalkMeetingDTO = pollDTO.getOpenTalkMeeting();
-        if(pollDTO.isEnabled() && MeetingStatus.WAITING_TOPIC.equals(openTalkMeetingDTO.getStatus()) &&
-           LocalDateTime.now().isAfter(openTalkMeetingDTO.getScheduledDate().minusDays(2))) {
+        if (pollDTO.isEnabled() && MeetingStatus.WAITING_TOPIC.equals(openTalkMeetingDTO.getStatus()) &&
+                LocalDateTime.now().isAfter(openTalkMeetingDTO.getScheduledDate().minusDays(2))) {
             Poll poll = PollMapper.INSTANCE.toEntity(pollDTO);
             List<TopicPoll> listTopicPoll = topicPollRepository.findByPollId(poll.getId());
             HashMap<TopicPoll, Long> resultTopicPoll = new HashMap<>();
@@ -63,6 +71,7 @@ public class PollServiceImpl implements PollService {
             );
             TopicPoll topicPoll = maxEntry.getKey();
             openTalkMeetingDTO.setTopic(TopicMapper.INSTANCE.toDto(topicPoll.getTopic()));
+            openTalkMeetingDTO.setStatus(MeetingStatus.WAITING_HOST_REGISTER);
             poll.setEnabled(false);
             poll.setOpenTalkMeeting(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
             pollRepository.save(poll);
@@ -81,9 +90,9 @@ public class PollServiceImpl implements PollService {
     @Override
     public boolean checkVoteAbility(long pollid, long userId) {
         List<TopicPoll> listAnswer = topicPollRepository.findByPollId(pollid);
-        for(TopicPoll topicPoll : listAnswer) {
+        for (TopicPoll topicPoll : listAnswer) {
             List<TopicVote> topicVote = topicVoteRepository.findByTopicPollIdAndVoterId(topicPoll.getId(), userId);
-            if(!topicVote.isEmpty()) {
+            if (!topicVote.isEmpty()) {
                 return false;
             }
         }

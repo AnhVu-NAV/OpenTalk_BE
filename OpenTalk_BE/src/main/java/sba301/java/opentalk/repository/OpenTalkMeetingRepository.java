@@ -78,4 +78,5 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
 
     List<OpenTalkMeeting> findByIdAndScheduledDateBetween(Long companyBranchId, LocalDateTime start, LocalDateTime end);
 
+    List<OpenTalkMeeting> findAllByStatus(MeetingStatus status);
 }

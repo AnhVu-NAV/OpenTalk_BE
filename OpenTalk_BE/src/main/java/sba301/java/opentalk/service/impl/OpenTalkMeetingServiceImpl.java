@@ -3,13 +3,24 @@ package sba301.java.opentalk.service.impl;
 import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
+import sba301.java.opentalk.common.StatusMeetingUpdateJob;
 import sba301.java.opentalk.dto.BaseDTO;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
@@ -64,6 +75,8 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     private final AttendanceRepository attendanceRepository;
     private final FeedbackRepository feedbackRepository;
     private final CompanyBranchRepository companyBranchRepository;
+    private final JedisPool jedisPool;
+    private final Scheduler scheduler;
 
     @Override
     public OpenTalkMeetingDTO createMeeting(OpenTalkMeetingDTO topic) {
@@ -310,7 +323,68 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
             openTalkMeeting.setDuration(2);
             openTalkMeetingRepository.save(openTalkMeeting);
             mailService.sendMailUpdateInfoMeetingForMeetingManager(OpenTalkMeetingMapper.INSTANCE.toDto(openTalkMeeting));
+            this.scheduleMeetingStatusUpdate(openTalkMeeting);
         });
+    }
+
+    @Override
+    public List<OpenTalkMeetingDTO> getAllMeetingsByStatus(MeetingStatus status) {
+        return openTalkMeetingRepository.findAllByStatus(status).stream().map(OpenTalkMeetingMapper.INSTANCE::toDto).toList();
+    }
+
+    @Override
+    public void scheduleMeetingStatusUpdate(OpenTalkMeeting openTalkMeeting) {
+        LocalDateTime scheduledDate = openTalkMeeting.getScheduledDate();
+        LocalDateTime endDateTime = scheduledDate.plusHours((long) openTalkMeeting.getDuration());
+
+        String cronExpressionForUpcomingToOngoing = buildCronExpression(scheduledDate);
+        scheduleStatusUpdateJob(openTalkMeeting, cronExpressionForUpcomingToOngoing, "UPCOMING_TO_ONGOING");
+
+        String cronExpressionForOngoingToCompleted = buildCronExpression(endDateTime);
+        scheduleStatusUpdateJob(openTalkMeeting, cronExpressionForOngoingToCompleted, "ONGOING_TO_COMPLETED");
+    }
+
+    @Override
+    public void updateMeetingStatus(Long meetingId, String jobType) {
+        OpenTalkMeeting meeting = openTalkMeetingRepository.findById(meetingId).orElseThrow(() -> new RuntimeException("Meeting not found"));
+
+        if ("UPCOMING_TO_ONGOING".equals(jobType) && meeting.getStatus() == MeetingStatus.UPCOMING) {
+            meeting.setStatus(MeetingStatus.ONGOING);
+        } else if ("ONGOING_TO_COMPLETED".equals(jobType) && meeting.getStatus() == MeetingStatus.ONGOING) {
+            meeting.setStatus(MeetingStatus.COMPLETED);
+        }
+
+        openTalkMeetingRepository.save(meeting);
+    }
+
+    private void scheduleStatusUpdateJob(OpenTalkMeeting openTalkMeeting, String cronExpression, String jobType) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.set("meeting:" + openTalkMeeting.getId() + ":" + jobType, cronExpression);
+        }
+        TriggerKey triggerKey = TriggerKey.triggerKey(openTalkMeeting.getId() + ":" + jobType);
+        JobDetail jobDetail = JobBuilder.newJob(StatusMeetingUpdateJob.class)
+                .withIdentity(openTalkMeeting.getId() + ":" + jobType)
+                .usingJobData("jobType", jobType)
+                .build();
+        CronTrigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(triggerKey)
+                .forJob(jobDetail)
+                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
+                .build();
+        try {
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            throw new RuntimeException("Failed to schedule status update job for meeting " + openTalkMeeting.getId(), e);
+        }
+    }
+
+    private String buildCronExpression(LocalDateTime endDateTime) {
+        return String.format("0 %d %d %d %d ? %d",
+                endDateTime.getMinute(),
+                endDateTime.getHour(),
+                endDateTime.getDayOfMonth(),
+                endDateTime.getMonthValue(),
+                endDateTime.getYear());
     }
 
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {

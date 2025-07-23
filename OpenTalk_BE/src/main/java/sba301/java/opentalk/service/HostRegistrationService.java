@@ -18,4 +18,6 @@ public interface HostRegistrationService {
     UserDTO findRandomHost(Long meetingId);
 
     List<HostFrequencyResponse> getUserHostFrequency();
+
+    void updateHostSelection();
 }

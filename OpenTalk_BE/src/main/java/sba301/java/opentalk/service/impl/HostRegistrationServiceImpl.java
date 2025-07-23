@@ -127,13 +127,18 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
     public List<HostFrequencyResponse> getUserHostFrequency() {
         List<UserHostFrequency> userHostFrequencyList = hostRegistrationRepository.getUserHostFrequency();
         return userHostFrequencyList.stream().map(userHostFrequency -> {
-                HostFrequencyResponse hostFrequencyResponse = new HostFrequencyResponse(
-                        userHostFrequency.getUserId(),
-                        userHostFrequency.getFullName(),
-                        userHostFrequency.getBranchName(),
-                        userHostFrequency.getApprovedCount(),
-                        userHostFrequency.getLastApprovedAt());
-                        return hostFrequencyResponse;
+            HostFrequencyResponse hostFrequencyResponse = new HostFrequencyResponse(
+                    userHostFrequency.getUserId(),
+                    userHostFrequency.getFullName(),
+                    userHostFrequency.getBranchName(),
+                    userHostFrequency.getApprovedCount(),
+                    userHostFrequency.getLastApprovedAt());
+            return hostFrequencyResponse;
         }).toList();
+    }
+
+    @Override
+    public void updateHostSelection() {
+
     }
 }
