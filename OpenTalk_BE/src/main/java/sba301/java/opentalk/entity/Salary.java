@@ -2,6 +2,7 @@ package sba301.java.opentalk.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import sba301.java.opentalk.enums.SalaryStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,4 +46,8 @@ public class Salary extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "recipient_id")
     private User recipient;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SalaryStatus status;
 }
