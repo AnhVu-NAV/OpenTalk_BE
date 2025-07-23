@@ -6,8 +6,9 @@ import sba301.java.opentalk.dto.TopicPollDTO;
 import java.util.List;
 
 public interface TopicPollService {
-    public void createTopicPoll(long topicId, long pollId);
+    public boolean createTopicPoll(long topicId, long pollId);
     public TopicPollDTO addTopicOption(TopicDTO topicPoll);
     public List<TopicPollDTO> getTopicPollByPoll(long openTalkMeetingId);
     public List<TopicPollDTO> getAll();
+    boolean deleteTopicPoll(long topicPollId);
 }

@@ -29,13 +29,18 @@ public class TopicPollServiceImpl implements TopicPollService {
     private final TopicRepository topicRepository;
 
     @Override
-    public void createTopicPoll(long topicId, long pollId) {
+    public boolean createTopicPoll(long topicId, long pollId) {
+        boolean result = topicPollRepository.existsByPollIdAndTopicId(pollId, topicId);
+        if(result) {
+            return false;
+        }
         Poll poll = pollRepository.findById((int) pollId).get();
         Topic topic = topicRepository.findById(topicId).get();
         TopicPoll topicPoll = new TopicPoll();
         topicPoll.setTopic(topic);
         topicPoll.setPoll(poll);
         topicPollRepository.save(topicPoll);
+        return true;
     }
 
     @Override
@@ -52,5 +57,14 @@ public class TopicPollServiceImpl implements TopicPollService {
     @Override
     public List<TopicPollDTO> getAll() {
         return topicPollRepository.findAll().stream().map(tp -> TopicPollMapper.INSTANCE.toDto(tp)).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean deleteTopicPoll(long topicPollId) {
+        if(topicPollRepository.existsById(topicPollId)) {
+            topicPollRepository.deleteById(topicPollId);
+            return true;
+        }
+        return false;
     }
 }
