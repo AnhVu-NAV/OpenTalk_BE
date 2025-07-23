@@ -42,7 +42,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/company-branch/**").hasRole("MEETING_MANAGER")
                         .requestMatchers("/api/attendance/generate-checkin-code").hasRole("MEETING_MANAGER")
                         .requestMatchers("/api/attendance/checkin-code").hasRole("MEETING_MANAGER")
-                        .requestMatchers("/api/attendance/**").hasAnyRole("MEETING_MANAGER", "USER")
+                        .requestMatchers("/api/attendance/**").hasAnyRole("MEETING_MANAGER", "USER", "HR")
                         .requestMatchers("/api/feedbacks/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/files/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/files/**").hasRole("MEETING_MANAGER")

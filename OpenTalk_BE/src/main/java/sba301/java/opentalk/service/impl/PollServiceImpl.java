@@ -52,7 +52,7 @@ public class PollServiceImpl implements PollService {
         if(pollDTO.isEnabled() && MeetingStatus.WAITING_TOPIC.equals(openTalkMeetingDTO.getStatus()) &&
            LocalDateTime.now().isAfter(openTalkMeetingDTO.getScheduledDate().minusDays(2))) {
             Poll poll = PollMapper.INSTANCE.toEntity(pollDTO);
-            List<TopicPoll> listTopicPoll = topicPollRepository.findByPoll(poll);
+            List<TopicPoll> listTopicPoll = topicPollRepository.findByPollId(poll.getId());
             HashMap<TopicPoll, Long> resultTopicPoll = new HashMap<>();
             for (TopicPoll topicPoll : listTopicPoll) {
                 resultTopicPoll.put(topicPoll, topicVoteRepository.countByTopicPoll(topicPoll));
@@ -63,8 +63,9 @@ public class PollServiceImpl implements PollService {
             );
             TopicPoll topicPoll = maxEntry.getKey();
             openTalkMeetingDTO.setTopic(TopicMapper.INSTANCE.toDto(topicPoll.getTopic()));
-            openTalkMeetingRepository.save(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
             poll.setEnabled(false);
+            poll.setOpenTalkMeeting(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
+            pollRepository.save(poll);
         }
     }
 
@@ -79,13 +80,10 @@ public class PollServiceImpl implements PollService {
 
     @Override
     public boolean checkVoteAbility(long pollid, long userId) {
-        User user = userRepository.findById(userId).get();
-        Poll poll = pollRepository.findByOpenTalkMeetingId((int)pollid);
-        List<TopicPoll> listAnswer = topicPollRepository.findByPoll(poll);
+        List<TopicPoll> listAnswer = topicPollRepository.findByPollId(pollid);
         for(TopicPoll topicPoll : listAnswer) {
-            TopicVote topicVote = new TopicVote();
-            topicVote = topicVoteRepository.findByTopicPollAndVoter(topicPoll, user);
-            if(topicVote == null) {
+            List<TopicVote> topicVote = topicVoteRepository.findByTopicPollIdAndVoterId(topicPoll.getId(), userId);
+            if(!topicVote.isEmpty()) {
                 return false;
             }
         }
