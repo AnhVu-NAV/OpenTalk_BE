@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sba301.java.opentalk.enums.CronKey;
+import sba301.java.opentalk.model.CronjobItemDTO;
 import sba301.java.opentalk.service.CronExpressionService;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cron")
@@ -20,19 +23,43 @@ public class CronController {
     private final CronExpressionService cronExpressionService;
 
     @PutMapping("/update")
-    public ResponseEntity<String> updateCron(@RequestParam CronKey key, @RequestParam String expression) {
+    public ResponseEntity<CronjobItemDTO> updateCron(
+            @RequestParam CronKey key,
+            @RequestParam String expression
+    ) {
         cronExpressionService.saveCronExpression(key, expression);
-        return ResponseEntity.ok("Updated " + key.getKey());
+
+        CronjobItemDTO dto = CronjobItemDTO.builder()
+                .cronjobKey(key.getKey())
+                .cronjobValue(expression)
+                .build();
+
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/get")
-    public ResponseEntity<String> getCron(@RequestParam CronKey key) {
+    public ResponseEntity<CronjobItemDTO> getCron(@RequestParam CronKey key) {
         String expression = cronExpressionService.getCronExpression(key);
-        return ResponseEntity.ok(expression);
+
+        CronjobItemDTO dto = CronjobItemDTO.builder()
+                .cronjobKey(key.getKey())
+                .cronjobValue(expression)
+                .build();
+
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Map<String, String>> getAllCrons() {
-        return ResponseEntity.ok(cronExpressionService.getAllCronExpressions());
+    public ResponseEntity<List<CronjobItemDTO>> getAllCrons() {
+        Map<String, String> all = cronExpressionService.getAllCronExpressions();
+        List<CronjobItemDTO> list = all.entrySet().stream()
+                .map(e -> CronjobItemDTO.builder()
+                        .cronjobKey(e.getKey())
+                        .cronjobValue(e.getValue())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(list);
     }
+
 }
