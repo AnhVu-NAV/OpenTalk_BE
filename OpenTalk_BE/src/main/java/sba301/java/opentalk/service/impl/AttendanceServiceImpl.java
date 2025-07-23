@@ -38,7 +38,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     private static final SecureRandom random = new SecureRandom();
 
     private static final String CODE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final String CHECKIN_CODE = "checkin_code";
+    private static final String CHECKIN_CODE = "checkin_code:";
 
     @Override
     public boolean isCheckin(Long meetingId, Long userId) {
@@ -97,7 +97,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public CheckinCodeGenerateResponse getCheckinCode(Long meetingId) {
-        List<String> keys = redisService.getKeysByPattern("checkin_code*");
+        List<String> keys = redisService.getKeysByPattern("checkin_code:*");
         for (String key : keys) {
             String value = redisService.get(key);
             long ttlInSeconds = redisService.getRemainingTtl(key);
