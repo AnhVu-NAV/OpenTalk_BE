@@ -18,7 +18,16 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("endDateTime") LocalDateTime endDateTime
     );
 
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE FUNCTION('YEAR', a.createdAt) = :year")
+    Integer countTotalAttendance(@Param("year") int year);
+
     List<Attendance> findAllByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
     List<Attendance> findAllByUserIdOrderByCreatedAtAsc(Long userId);
+
+    @Query("SELECT FUNCTION('MONTH', a.createdAt) AS month, COUNT(a) " +
+            "FROM Attendance a " +
+            "WHERE FUNCTION('YEAR', a.createdAt) = :year " +
+            "GROUP BY FUNCTION('MONTH', a.createdAt)")
+    List<Object[]> countAttendanceByMonth(@Param("year") int year);
 }

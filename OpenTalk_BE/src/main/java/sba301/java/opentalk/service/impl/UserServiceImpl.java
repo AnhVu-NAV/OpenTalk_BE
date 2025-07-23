@@ -18,25 +18,38 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
 import sba301.java.opentalk.dto.EmployeeDTO;
+import sba301.java.opentalk.dto.HRDashboardDTO;
 import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.entity.Attendance;
 import sba301.java.opentalk.entity.CompanyBranch;
+import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.Role;
 import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.exception.AppException;
 import sba301.java.opentalk.exception.ErrorCode;
 import sba301.java.opentalk.mapper.EmployeeMapper;
+import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.UserMapper;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
 import sba301.java.opentalk.model.response.EmployeeExportDTO;
+import sba301.java.opentalk.repository.AttendanceRepository;
 import sba301.java.opentalk.repository.CompanyBranchRepository;
+import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.repository.RoleRepository;
 import sba301.java.opentalk.repository.UserRepository;
 import sba301.java.opentalk.service.UserService;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +60,8 @@ public class UserServiceImpl implements UserService {
     private final RandomOpenTalkNumberGenerator randomOpenTalkNumberGenerator;
     private final CompanyBranchRepository companyBranchRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OpenTalkMeetingRepository openTalkMeetingRepository;
+    private final AttendanceRepository attendanceRepository;
 
     @Override
     public UserDTO createUser(User user) {
@@ -57,10 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getUsers() {
-        log.info("Start get all users query");
-//      no use: list, userList
         List<User> users = userRepository.findAll();
-        log.info("End get all users query");
         return users.stream().map(UserMapper.INSTANCE::userToUserDTO).toList();
     }
 
@@ -281,6 +293,55 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException();
         }
         return employeeExportDTOList;
+    }
+
+    @Override
+    public HRDashboardDTO getDataForDashboard() {
+        HRDashboardDTO hrDashboardDTO = new HRDashboardDTO();
+        hrDashboardDTO.setTotalEmployees((long) this.getUsers().size());
+        hrDashboardDTO.setTotalMeetings(openTalkMeetingRepository.countCompletedMeetingsInYear(MeetingStatus.COMPLETED, LocalDate.now().getYear()));
+        hrDashboardDTO.setAttendanceRate((double) attendanceRepository.findAll().size() / (hrDashboardDTO.getTotalMeetings() * hrDashboardDTO.getTotalEmployees()));
+
+        List<Attendance> allAttendances = attendanceRepository.findAll();
+
+        Map<String, Integer> monthlyAttendanceTrends = allAttendances.stream()
+                .filter(attendance -> attendance.getCreatedAt().getYear() == LocalDate.now().getYear())
+                .collect(Collectors.groupingBy(
+                        attendance -> Month.of(attendance.getCreatedAt().getMonthValue()).name(),
+                        Collectors.collectingAndThen(Collectors.toList(), List::size)
+                ));
+
+        Map<String, Integer> monthlyAttendance = new HashMap<>();
+        for (Month month : Month.values()) {
+            monthlyAttendance.put(month.name(), monthlyAttendanceTrends.getOrDefault(month.name(), 0));
+        }
+        hrDashboardDTO.setMonthlyAttendanceTrends(monthlyAttendance);
+        hrDashboardDTO.setRecentMeetings(
+                openTalkMeetingRepository.findAll().stream()
+                        .sorted(Comparator.comparing(OpenTalkMeeting::getScheduledDate).reversed())
+                        .limit(3)
+                        .map(OpenTalkMeetingMapper.INSTANCE::toDto)
+                        .collect(Collectors.toList()));
+        hrDashboardDTO.setBranchMeetingStats(this.getBranchMeetingStats(LocalDate.now().getYear()));
+        return hrDashboardDTO;
+    }
+
+    private Map<String, Integer> getBranchMeetingStats(int year) {
+        List<OpenTalkMeeting> allMeetings = openTalkMeetingRepository.findAll();
+
+        List<OpenTalkMeeting> meetingsInYear = allMeetings.stream()
+                .filter(meeting -> meeting.getScheduledDate().getYear() == year)
+                .toList();
+
+        Map<CompanyBranch, Long> meetingStatsByCompany = meetingsInYear.stream()
+                .collect(Collectors.groupingBy(OpenTalkMeeting::getCompanyBranch, Collectors.counting()));
+
+        Map<String, Integer> departmentMeetingStats = new HashMap<>();
+        for (Map.Entry<CompanyBranch, Long> entry : meetingStatsByCompany.entrySet()) {
+            departmentMeetingStats.put(entry.getKey().getName(), entry.getValue().intValue());
+        }
+
+        return departmentMeetingStats;
     }
 
     @Override

@@ -79,4 +79,11 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
     List<OpenTalkMeeting> findByIdAndScheduledDateBetween(Long companyBranchId, LocalDateTime start, LocalDateTime end);
 
     List<OpenTalkMeeting> findAllByStatus(MeetingStatus status);
+
+
+    @Query("SELECT COUNT(o) FROM OpenTalkMeeting o " +
+            "WHERE o.status = :status " +
+            "AND FUNCTION('YEAR', o.scheduledDate) = :year")
+    Long countCompletedMeetingsInYear(@Param("status") MeetingStatus status,
+                                      @Param("year") int year);
 }

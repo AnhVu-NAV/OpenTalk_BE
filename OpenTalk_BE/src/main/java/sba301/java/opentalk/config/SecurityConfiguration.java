@@ -33,8 +33,7 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/api/files/**",
-                                "/api/users/**")
+                                "/api/files/**")
                         .permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/company-branch/**").hasAnyRole("MEETING_MANAGER", "USER")
@@ -61,8 +60,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/topic-poll/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/topic-vote/**").hasAnyRole("MEETING_MANAGER", "USER")
                         .requestMatchers("/api/opentalk-meeting/**").hasAnyRole("USER", "MEETING_MANAGER")
-                        .requestMatchers("/api/hr/**").hasRole("HR")
+                        .requestMatchers("/api/hr/**").hasAnyRole("MEETING_MANAGER", "USER", "HR")
                         .requestMatchers("/api/salaries/**").hasRole("HR")
+                        .requestMatchers("/api/users/**").hasAnyRole("MEETING_MANAGER", "USER", "HR")
 
                         .anyRequest()
                         .authenticated())

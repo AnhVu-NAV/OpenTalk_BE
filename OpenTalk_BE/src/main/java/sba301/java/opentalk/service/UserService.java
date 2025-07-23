@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import sba301.java.opentalk.dto.EmployeeDTO;
+import sba301.java.opentalk.dto.HRDashboardDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.exception.AppException;
@@ -41,7 +42,7 @@ public interface UserService {
 
     List<UserDTO> getAvailableUsersTobeHost();
 
-    public void generateRandom();
+    void generateRandom();
 
     Page<EmployeeDTO> findEmployees(String email, Boolean isEnable, Long companyBranchId, Pageable pageable);
 
@@ -50,5 +51,7 @@ public interface UserService {
     EmployeeDTO updateEmployee(Long userId, EmployeeDTO dto);
 
     List<EmployeeExportDTO> exportEmployeeList(Boolean isEnable, Long companyBranchId, HttpServletResponse response) throws AppException;
+
+    HRDashboardDTO getDataForDashboard();
 
 }
