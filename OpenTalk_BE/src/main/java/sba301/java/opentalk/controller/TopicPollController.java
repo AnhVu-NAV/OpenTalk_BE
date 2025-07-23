@@ -23,8 +23,9 @@ public class TopicPollController {
     }
 
     @PostMapping
-    public ResponseEntity<TopicPollDTO> createNewTopicPoll(@RequestBody TopicPollDTO topicPollDTO) {
-        topicPollService.createTopicPoll(topicPollDTO);
+    public ResponseEntity<TopicPollDTO> createNewTopicPoll(@RequestParam(required = false) long topicId,
+                                                           @RequestParam(required = false) long pollId) {
+        topicPollService.createTopicPoll(topicId,  pollId);
         return ResponseEntity.ok().build();
     }
 

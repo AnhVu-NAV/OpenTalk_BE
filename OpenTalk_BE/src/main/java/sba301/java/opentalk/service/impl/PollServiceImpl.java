@@ -75,6 +75,7 @@ public class PollServiceImpl implements PollService {
         Poll poll = new Poll();
         poll.setOpenTalkMeeting(openTalkMeeting);
         poll.setEnabled(true);
+        pollRepository.save(poll);
         return PollMapper.INSTANCE.toDto(poll);
     }
 
