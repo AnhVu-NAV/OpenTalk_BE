@@ -3,10 +3,7 @@ package sba301.java.opentalk.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.model.response.HostFrequencyResponse;
@@ -14,6 +11,7 @@ import sba301.java.opentalk.service.HostRegistrationService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/hosts")
@@ -40,6 +38,24 @@ public class HostRegistrationController {
     @GetMapping("/auto-select-host/{openTalkMeetingId}")
     public ResponseEntity<UserDTO> getRandomHost(@PathVariable Long openTalkMeetingId) {
         return ResponseEntity.ok().body(hostRegistrationService.findRandomHost(openTalkMeetingId));
+    }
+
+    @PostMapping("/request-counts")
+    public ResponseEntity<Map<Long, Long>> getRequestCounts(@RequestBody List<Long> meetingIds) {
+        Map<Long, Long> map = hostRegistrationService.getRequestCountForMeetings(meetingIds);
+        return ResponseEntity.ok(map);
+    }
+
+    @PostMapping("/approve/{registrationId}")
+    public ResponseEntity<?> approveHostRegistration(@PathVariable Long registrationId) {
+        hostRegistrationService.approveHostRegistration(registrationId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reject/{registrationId}")
+    public ResponseEntity<?> rejectHostRegistration(@PathVariable Long registrationId) {
+        hostRegistrationService.rejectHostRegistration(registrationId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/native-query/frequency")
