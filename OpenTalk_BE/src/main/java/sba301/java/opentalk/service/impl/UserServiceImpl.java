@@ -4,11 +4,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import sba301.java.opentalk.common.RandomOpenTalkNumberGenerator;
 import sba301.java.opentalk.dto.EmployeeDTO;
 import sba301.java.opentalk.dto.UserDTO;
@@ -25,14 +32,7 @@ import sba301.java.opentalk.repository.CompanyBranchRepository;
 import sba301.java.opentalk.repository.RoleRepository;
 import sba301.java.opentalk.repository.UserRepository;
 import sba301.java.opentalk.service.UserService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllByRoleName("ADMIN").stream().map(UserMapper.INSTANCE::userToUserDTO).toList();
     }
 
-    @Cacheable(value = "currentUser", key = "#userId")
     @Override
     public UserDTO getUserById(Long userId) throws AppException {
         log.info("Miss at cache. Call to database.");
@@ -78,7 +77,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    @CachePut(value = "currentUser", key = "#userId")
     @Transactional
     @Override
     public UserDTO updateUser(Long userId, UserDTO dto) {
@@ -137,7 +135,6 @@ public class UserServiceImpl implements UserService {
                 .map(UserMapper.INSTANCE::userToUserDTO);
     }
 
-    @CacheEvict(value = "currentUser", key = "#userId")
     @Override
     public boolean deleteUser(Long userId) {
         User existingUser = userRepository.findById(userId).orElse(null);
@@ -178,10 +175,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<EmployeeDTO> findEmployees(String email, Boolean isEnable, Long companyBranch, Pageable pageable) {
         Page<User> page = null;
-        if (isEnable == null ||companyBranch == null ) {
+        if (isEnable == null || companyBranch == null) {
             page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, null, null, pageable);
-        }else{
-            CompanyBranch company= companyBranchRepository.findById((long)companyBranch).get();
+        } else {
+            CompanyBranch company = companyBranchRepository.findById((long) companyBranch).get();
             page = userRepository.findByEmailAndIsEnabledAndCompanyBranch(email, isEnable, company, pageable);
         }
         return page.map(EmployeeMapper.INSTANCE::toDto);
@@ -252,31 +249,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<EmployeeExportDTO> exportEmployeeList(Boolean isEnable, Long companyBranchId, HttpServletResponse response) {
-                response.setContentType(
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                );
-                response.setHeader(
-                        "Content-Disposition",
-                        "attachment; filename=employees.xlsx"
-                );
-                List<User> userEntityList = new ArrayList<>();
-                if(isEnable == null || companyBranchId == null) {
-                    userEntityList = userRepository.findByIsEnabledAndCompanyBranch(true, null);
-                }else {
-                    userEntityList = userRepository.findByIsEnabledAndCompanyBranch(isEnable, companyBranchRepository.findById(companyBranchId).get());
-                }
-                List<EmployeeExportDTO> employeeExportDTOList = new ArrayList<>();
-                for (User userEntity : userEntityList) {
-                    EmployeeExportDTO employeeExportDTO = mapUsertoEmployeeExportDTO(userEntity);
-                    employeeExportDTOList.add(employeeExportDTO);
-                }
-                try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-                    XSSFSheet sheet = workbook.createSheet("Employees");
-                    writeHeader(sheet);
-                    writeData(sheet, employeeExportDTOList);
-                    workbook.write(response.getOutputStream());
-                } catch (IOException e) {
-                    throw new RuntimeException();
+        response.setContentType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=employees.xlsx"
+        );
+        List<User> userEntityList = new ArrayList<>();
+        if (isEnable == null || companyBranchId == null) {
+            userEntityList = userRepository.findByIsEnabledAndCompanyBranch(true, null);
+        } else {
+            userEntityList = userRepository.findByIsEnabledAndCompanyBranch(isEnable, companyBranchRepository.findById(companyBranchId).get());
+        }
+        List<EmployeeExportDTO> employeeExportDTOList = new ArrayList<>();
+        for (User userEntity : userEntityList) {
+            EmployeeExportDTO employeeExportDTO = mapUsertoEmployeeExportDTO(userEntity);
+            employeeExportDTOList.add(employeeExportDTO);
+        }
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            XSSFSheet sheet = workbook.createSheet("Employees");
+            writeHeader(sheet);
+            writeData(sheet, employeeExportDTOList);
+            workbook.write(response.getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException();
         }
         return employeeExportDTOList;
     }
@@ -285,6 +282,7 @@ public class UserServiceImpl implements UserService {
     public EmployeeDTO getEmployeeById(Long employeeId) throws AppException {
         return userRepository.findById(employeeId).map(EmployeeMapper.INSTANCE::toDto).orElse(null);
     }
+
     private void writeHeader(XSSFSheet sheet) {
         XSSFRow header = sheet.createRow(0);
         XSSFCellStyle style = sheet.getWorkbook().createCellStyle();
