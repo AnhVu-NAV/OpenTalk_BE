@@ -27,11 +27,13 @@ import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
+import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.enums.MailType;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
+import sba301.java.opentalk.mapper.UserMapper;
 import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
@@ -49,11 +51,11 @@ import sba301.java.opentalk.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,6 +89,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     @Override
     public OpenTalkMeetingDTO updateMeeting(OpenTalkMeetingDTO topic, Long topicId) {
         if (meetingRepository.existsById(topicId)) {
+            topic.setHost(null);
             topic.setId(topicId);
             meetingRepository.save(OpenTalkMeetingMapper.INSTANCE.toEntity(topic));
             return topic;
@@ -120,7 +123,12 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         Page<OpenTalkMeeting> meetingPage = meetingRepository.findWithFilter(
                 name, companyBranchId, status, date, fromDateTime, toDateTime, pageable
         );
-        return meetingPage.map(OpenTalkMeetingMapper.INSTANCE::toDto);
+
+        return meetingPage.map(OpenTalkMeetingMapper.INSTANCE::toDto)
+                .map(dto -> {
+                    dto.setHost(UserMapper.INSTANCE.userToUserDTO(hostRegistrationRepository.findByOpenTalkMeetingIdAndStatus(dto.getId(), HostRegistrationStatus.APPROVED).get(0).getUser()));
+                    return dto;
+                });
     }
 
     @Override

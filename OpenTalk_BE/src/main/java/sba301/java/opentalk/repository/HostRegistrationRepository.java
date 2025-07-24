@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import sba301.java.opentalk.dto.IHostRegistration;
 import sba301.java.opentalk.dto.UserHostFrequency;
 import sba301.java.opentalk.entity.HostRegistration;
+import sba301.java.opentalk.entity.User;
+import sba301.java.opentalk.model.response.HostFrequencyResponse;
+import sba301.java.opentalk.enums.HostRegistrationStatus;
 
 import java.util.List;
 
@@ -15,7 +18,8 @@ import java.util.List;
 public interface HostRegistrationRepository extends JpaRepository<HostRegistration, Long> {
     boolean existsByUserIdAndOpenTalkMeetingId(Long userId, Long openTalkMeetingId);
 
-    List<HostRegistration> findByOpenTalkMeetingId(Long topicId);
+    List<HostRegistration> findByOpenTalkMeetingIdAndStatus(Long openTalkMeetingId, HostRegistrationStatus status);
+
 
     @Query("SELECT r.user AS host, r.openTalkMeeting.id AS meetingId FROM HostRegistration r " +
             "WHERE r.openTalkMeeting.id IN :meetingIds AND r.status = sba301.java.opentalk.enums.HostRegistrationStatus.APPROVED")
@@ -36,6 +40,11 @@ public interface HostRegistrationRepository extends JpaRepository<HostRegistrati
             "JOIN r.user.role ro " +
             "WHERE r.openTalkMeeting.id = :topicId")
     List<HostRegistration> findByOpenTalkMeetingIdWithNativeQuery(@Param("topicId") Long topicId);
+
+    @Query("SELECT r.openTalkMeeting.id, COUNT(r) FROM HostRegistration r " +
+            "WHERE r.openTalkMeeting.id  IN :meetingIds AND r.status = :status GROUP BY r.openTalkMeeting.id")
+    List<Object[]> countRequestsByMeetingIds(@Param("meetingIds") List<Long> meetingIds,
+                                             @Param("status") HostRegistrationStatus status);
 
     @Query(value = """
             SELECT  u.id AS userId,

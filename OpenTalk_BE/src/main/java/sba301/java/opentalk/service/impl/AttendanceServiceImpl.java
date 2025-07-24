@@ -49,8 +49,10 @@ public class AttendanceServiceImpl implements AttendanceService {
     public CheckinCodeGenerateResponse generateCheckinCode(Long meetingId, int validMinutes) {
         String code = generateRandomCode();
         String redisKey = CHECKIN_CODE + code;
+        String keyMeeting = CHECKIN_CODE + ":meeting:" + meetingId;
 
         redisService.saveKeyWithTTL(redisKey, String.valueOf(meetingId), validMinutes * 60L);
+        redisService.saveKeyWithTTL(keyMeeting, code, validMinutes * 60L);
         return CheckinCodeGenerateResponse.builder()
                 .checkinCode(code)
                 .expiresAt(LocalDateTime.now().plusMinutes(validMinutes))
