@@ -395,6 +395,11 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         return OpenTalkMeetingMapper.INSTANCE.toDto(meeting);
     }
 
+    @Override
+    public List<OpenTalkMeetingDTO> findAllMeeting(String name) {
+        return openTalkMeetingRepository.findByMeetingName(name).stream().map(OpenTalkMeetingMapper.INSTANCE::toDto).toList();
+    }
+
     private OpenTalkMeetingDetailDTO convertToDetailDTO(OpenTalkMeeting meeting) {
         OpenTalkMeetingDetailDTO detail = new OpenTalkMeetingDetailDTO();
         detail.setId(meeting.getId());
