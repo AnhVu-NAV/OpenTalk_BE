@@ -6,11 +6,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import sba301.java.opentalk.dto.UserDTO;
-import sba301.java.opentalk.repository.RoleRepository;
-import sba301.java.opentalk.service.JWTService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sba301.java.opentalk.dto.UserDTO;
+import sba301.java.opentalk.exception.AppException;
+import sba301.java.opentalk.exception.ErrorCode;
+import sba301.java.opentalk.repository.RoleRepository;
+import sba301.java.opentalk.repository.UserRepository;
+import sba301.java.opentalk.service.JWTService;
 
 import java.security.Key;
 import java.util.Date;
@@ -26,6 +29,7 @@ public class JWTServiceImpl implements JWTService {
     private long expirationRefreshToken;
 
     private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @Override
     public String generateAcessToken(UserDTO user) {
@@ -83,6 +87,34 @@ public class JWTServiceImpl implements JWTService {
             } else return -1;
         }
         return -1;
+    }
+
+    @Override
+    public String generatePasswordResetToken(String email) throws AppException {
+        if (userRepository.findByEmail(email).isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
+    @Override
+    public String validatePasswordResetToken(String token) throws AppException {
+        Claims claims = extractAllClaims(token);
+        if (claims == null) {
+            throw new AppException(ErrorCode.VALIDATION_ERROR);
+        }
+        Date expiration = claims.getExpiration();
+        if (expiration.before(new Date())) {
+            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+        }
+        return claims.getSubject();
     }
 
     private Key getSignInKey() {

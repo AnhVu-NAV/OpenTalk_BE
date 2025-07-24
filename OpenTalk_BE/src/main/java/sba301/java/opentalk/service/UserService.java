@@ -54,4 +54,7 @@ public interface UserService {
 
     HRDashboardDTO getDataForDashboard();
 
+    boolean checkIfEmailExists(String email);
+
+    void updatePassword(String email, String password) throws AppException;
 }

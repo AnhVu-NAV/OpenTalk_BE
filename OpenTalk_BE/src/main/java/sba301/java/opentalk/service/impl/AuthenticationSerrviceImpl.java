@@ -66,15 +66,15 @@ public class AuthenticationSerrviceImpl implements AuthenticationService {
 
     @Override
     public ApiResponse<AuthenticationResponse> login(AuthenticationRequest request) {
+        UserDTO dto = userService.getUserByEmail(request.getEmail()).orElse(null);
+        if (dto == null) {
+            throw new UsernameNotFoundException(request.getEmail());
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        dto.getUsername(),
                         request.getPassword()));
-
-        UserDTO dto = userService.getUserByUsername(request.getUsername()).orElse(null);
-        if (dto == null) {
-            throw new UsernameNotFoundException(request.getUsername());
-        }
 
         String accessToken = jwtService.generateAcessToken(dto);
         String refreshToken = jwtService.generateRefreshToken(dto);

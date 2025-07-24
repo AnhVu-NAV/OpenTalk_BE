@@ -87,4 +87,7 @@ public interface OpenTalkMeetingRepository extends JpaRepository<OpenTalkMeeting
             "AND FUNCTION('YEAR', o.scheduledDate) = :year")
     Long countCompletedMeetingsInYear(@Param("status") MeetingStatus status,
                                       @Param("year") int year);
+
+    @Query("SELECT o FROM OpenTalkMeeting o WHERE (:meetingName IS NULL OR LOWER(o.meetingName) LIKE LOWER(CONCAT('%', :meetingName, '%')))")
+    List<OpenTalkMeeting> findByMeetingName(String meetingName);
 }

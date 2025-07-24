@@ -48,7 +48,11 @@ public class OpenTalkMeetingController {
         );
         return ResponseEntity.ok(dtos);
     }
-
+    @GetMapping("/all")
+    public ResponseEntity<List<OpenTalkMeetingDTO>> findAllMeetingsWithName(@RequestParam String name) {
+          List<OpenTalkMeetingDTO> result = openTalkMeetingService.findAllMeeting(name);
+          return ResponseEntity.ok(result);
+    }
     @GetMapping("/details")
     public ResponseEntity<List<OpenTalkMeetingDetailDTO>> getMeetingDetails(
             @RequestParam(required = false, defaultValue = "") String meetingName,

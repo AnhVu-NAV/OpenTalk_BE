@@ -42,4 +42,16 @@ public class MailServiceImpl implements MailService {
         mail.setMailContent("Please update information and choose topic vote for Meeting: " + openTalkMeetingDTO.getMeetingName());
         this.sendMail(mail);
     }
+
+    @Override
+    public void sendPasswordResetMail(String email, String token) {
+        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+
+        Mail mail = new Mail();
+        mail.setMailTo(new String[]{email});
+        mail.setMailSubject("Password Reset Request");
+        mail.setMailContent("Click the following link to reset your password: " + resetLink);
+
+        this.sendMail(mail);
+    }
 }
