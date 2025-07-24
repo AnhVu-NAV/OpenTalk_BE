@@ -89,6 +89,7 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
     @Override
     public OpenTalkMeetingDTO updateMeeting(OpenTalkMeetingDTO topic, Long topicId) {
         if (meetingRepository.existsById(topicId)) {
+            topic.setHost(null);
             topic.setId(topicId);
             meetingRepository.save(OpenTalkMeetingMapper.INSTANCE.toEntity(topic));
             return topic;

@@ -18,13 +18,14 @@ public interface HostRegistrationService {
 
     UserDTO findRandomHost(Long meetingId);
 
-    List<HostFrequencyResponse> getUserHostFrequency();
-
-    void updateHostSelection();
-
     Map<Long, Long> getRequestCountForMeetings(List<Long> meetingIds);
 
     void approveHostRegistration(Long registrationId);
 
     void rejectHostRegistration(Long registrationId);
+
+    List<HostFrequencyResponse> getUserHostFrequency();
+
+    void updateHostSelection();
+
 }

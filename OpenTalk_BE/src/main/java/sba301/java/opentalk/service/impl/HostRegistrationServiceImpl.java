@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.HostRegistrationDTO;
@@ -19,12 +20,14 @@ import sba301.java.opentalk.event.HostRegistrationEvent;
 import sba301.java.opentalk.mapper.HostRegistrationMapper;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.UserMapper;
+import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.UserHostCount;
 import sba301.java.opentalk.model.response.HostFrequencyResponse;
 import sba301.java.opentalk.repository.HostRegistrationRepository;
 import sba301.java.opentalk.repository.OpenTalkMeetingRepository;
 import sba301.java.opentalk.repository.UserRepository;
 import sba301.java.opentalk.service.HostRegistrationService;
+import sba301.java.opentalk.service.MailService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +46,9 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
     private final UserRepository userRepository;
     private final OpenTalkMeetingRepository meetingRepository;
     private final ApplicationEventPublisher eventPublisher;
+
+    private final MailService mailService;
+
 
     @Override
     public void registerOpenTalk(HostRegistrationDTO registrationDTO) {
@@ -179,6 +185,17 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
         meeting.setHost(approvedReg.getUser());
         meeting.setStatus(MeetingStatus.WAITING_HOST_SELECTION);
         meetingRepository.save(meeting);
+
+        String userEmail = approvedReg.getUser().getEmail();
+        if (userEmail == null || userEmail.isBlank()) {
+            throw new IllegalArgumentException("User email is missing!");
+        }
+
+        Mail mail = new Mail();
+        mail.setMailTo(new String[]{userEmail});
+        mail.setMailSubject("OpenTalk: Host Registration Approved");
+        mail.setMailContent("Congratulations! You have been approved as the host for meeting: " + meeting.getMeetingName());
+        mailService.sendMail(mail);
     }
 
     @Override

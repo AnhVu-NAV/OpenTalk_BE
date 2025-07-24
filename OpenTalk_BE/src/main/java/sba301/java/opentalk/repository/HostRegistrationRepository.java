@@ -41,6 +41,11 @@ public interface HostRegistrationRepository extends JpaRepository<HostRegistrati
             "WHERE r.openTalkMeeting.id = :topicId")
     List<HostRegistration> findByOpenTalkMeetingIdWithNativeQuery(@Param("topicId") Long topicId);
 
+    @Query("SELECT r.openTalkMeeting.id, COUNT(r) FROM HostRegistration r " +
+            "WHERE r.openTalkMeeting.id  IN :meetingIds AND r.status = :status GROUP BY r.openTalkMeeting.id")
+    List<Object[]> countRequestsByMeetingIds(@Param("meetingIds") List<Long> meetingIds,
+                                             @Param("status") HostRegistrationStatus status);
+
     @Query(value = """
             SELECT  u.id AS userId,
                     u.full_name AS fullName,
@@ -53,9 +58,4 @@ public interface HostRegistrationRepository extends JpaRepository<HostRegistrati
             GROUP BY u.id, u.full_name, c.name
             """, nativeQuery = true)
     List<UserHostFrequency> getUserHostFrequency();
-
-    @Query("SELECT r.openTalkMeeting.id, COUNT(r) FROM HostRegistration r " +
-            "WHERE r.openTalkMeeting.id  IN :meetingIds AND r.status = :status GROUP BY r.openTalkMeeting.id")
-    List<Object[]> countRequestsByMeetingIds(@Param("meetingIds") List<Long> meetingIds,
-                                             @Param("status") HostRegistrationStatus status);
 }
