@@ -33,6 +33,7 @@ import sba301.java.opentalk.enums.HostRegistrationStatus;
 import sba301.java.opentalk.enums.MailType;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
+import sba301.java.opentalk.mapper.UserMapper;
 import sba301.java.opentalk.model.Mail.Mail;
 import sba301.java.opentalk.model.Mail.MailSubjectFactory;
 import sba301.java.opentalk.model.request.OpenTalkCompletedRequest;
@@ -121,7 +122,12 @@ public class OpenTalkMeetingServiceImpl implements OpenTalkMeetingService {
         Page<OpenTalkMeeting> meetingPage = meetingRepository.findWithFilter(
                 name, companyBranchId, status, date, fromDateTime, toDateTime, pageable
         );
-        return meetingPage.map(OpenTalkMeetingMapper.INSTANCE::toDto);
+
+        return meetingPage.map(OpenTalkMeetingMapper.INSTANCE::toDto)
+                .map(dto -> {
+                    dto.setHost(UserMapper.INSTANCE.userToUserDTO(hostRegistrationRepository.findByOpenTalkMeetingIdAndStatus(dto.getId(), HostRegistrationStatus.APPROVED).get(0).getUser()));
+                    return dto;
+                });
     }
 
     @Override
