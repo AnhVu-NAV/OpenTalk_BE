@@ -5,6 +5,7 @@ import sba301.java.opentalk.dto.UserDTO;
 import sba301.java.opentalk.model.response.HostFrequencyResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface HostRegistrationService {
     void registerOpenTalk(HostRegistrationDTO registrationDTO);
@@ -20,4 +21,10 @@ public interface HostRegistrationService {
     List<HostFrequencyResponse> getUserHostFrequency();
 
     void updateHostSelection();
+
+    Map<Long, Long> getRequestCountForMeetings(List<Long> meetingIds);
+
+    void approveHostRegistration(Long registrationId);
+
+    void rejectHostRegistration(Long registrationId);
 }

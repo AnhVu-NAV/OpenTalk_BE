@@ -14,7 +14,9 @@ import sba301.java.opentalk.entity.HostRegistration;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.entity.User;
 import sba301.java.opentalk.enums.HostRegistrationStatus;
+import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.event.HostRegistrationEvent;
+import sba301.java.opentalk.mapper.HostRegistrationMapper;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.UserMapper;
 import sba301.java.opentalk.model.UserHostCount;
@@ -26,7 +28,9 @@ import sba301.java.opentalk.service.HostRegistrationService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -64,16 +68,14 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
 
     @Override
     public List<HostRegistrationDTO> findByOpenTalkMeetingId(Long topicId) {
-        ModelMapper modelMapper = new ModelMapper();
-        List<HostRegistration> hostRegistrations = hostRegistrationRepository.findByOpenTalkMeetingId(topicId);
-        return hostRegistrations.stream().map(hostRegistration -> modelMapper.map(hostRegistration, HostRegistrationDTO.class)).toList();
+        List<HostRegistration> hostRegistrations = hostRegistrationRepository.findByOpenTalkMeetingIdAndStatus(topicId, HostRegistrationStatus.PENDING);
+        return hostRegistrations.stream().map(HostRegistrationMapper.INSTANCE::toDto).toList();
     }
 
     @Override
     public List<HostRegistrationDTO> findByOpenTalkMeetingIdWithNativeQuery(Long topicId) {
         List<HostRegistration> dtos = hostRegistrationRepository.findByOpenTalkMeetingIdWithNativeQuery(topicId);
-        ModelMapper modelMapper = new ModelMapper();
-        return dtos.stream().map(openTalkRegistration -> modelMapper.map(openTalkRegistration, HostRegistrationDTO.class)).toList();
+        return dtos.stream().map(HostRegistrationMapper.INSTANCE::toDto).toList();
     }
 
     @Override
@@ -140,5 +142,50 @@ public class HostRegistrationServiceImpl implements HostRegistrationService {
     @Override
     public void updateHostSelection() {
 
+    }
+
+    @Override
+    public Map<Long, Long> getRequestCountForMeetings(List<Long> meetingIds) {
+        Map<Long, Long> map = new HashMap<>();
+        if (meetingIds == null || meetingIds.isEmpty()) return map;
+
+        List<Object[]> results = hostRegistrationRepository.countRequestsByMeetingIds(meetingIds, HostRegistrationStatus.PENDING);
+        for (Object[] row : results) {
+            Long meetingId = (Long) row[0];
+            Long count = (Long) row[1];
+            map.put(meetingId, count);
+        }
+        return map;
+    }
+
+    @Override
+    public void approveHostRegistration(Long registrationId) {
+        HostRegistration approvedReg = hostRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Not found"));
+
+        List<HostRegistration> allRegs = hostRegistrationRepository
+                .findByOpenTalkMeetingIdAndStatus(approvedReg.getOpenTalkMeeting().getId(), approvedReg.getStatus());
+
+        for (HostRegistration reg : allRegs) {
+            if (reg.getId() == registrationId) {
+                reg.setStatus(HostRegistrationStatus.APPROVED);
+            } else {
+                reg.setStatus(HostRegistrationStatus.REJECTED);
+            }
+        }
+        hostRegistrationRepository.saveAll(allRegs);
+
+        OpenTalkMeeting meeting = approvedReg.getOpenTalkMeeting();
+        meeting.setHost(approvedReg.getUser());
+        meeting.setStatus(MeetingStatus.WAITING_HOST_SELECTION);
+        meetingRepository.save(meeting);
+    }
+
+    @Override
+    public void rejectHostRegistration(Long registrationId) {
+        HostRegistration reg = hostRegistrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Not found"));
+        reg.setStatus(HostRegistrationStatus.REJECTED);
+        hostRegistrationRepository.save(reg);
     }
 }

@@ -41,7 +41,7 @@ public class OpenTalkMeetingController {
             @RequestParam(required = false) String fromDate,
             @RequestParam(required = false) String toDate,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "5") int size
     ) {
         Page<OpenTalkMeetingDTO> dtos = openTalkMeetingService.getAllMeetings(
                 name, companyBranchId, status, date, fromDate, toDate, page, size
