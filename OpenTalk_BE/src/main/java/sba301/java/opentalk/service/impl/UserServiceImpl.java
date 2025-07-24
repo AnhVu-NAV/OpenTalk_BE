@@ -231,35 +231,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public EmployeeDTO updateEmployee(Long userId, EmployeeDTO dto) {
         User existingUser = userRepository.findById(userId).orElse(null);
-        CompanyBranch companyBranch = new CompanyBranch();
         if (existingUser != null) {
-            if (dto.getFullName() != null) {
-                existingUser.setFullName(dto.getFullName());
-            }
-            if (dto.getEmail() != null) {
-                existingUser.setEmail(dto.getEmail());
-            }
-            if (dto.getUsername() != null) {
-                existingUser.setUsername(dto.getUsername());
-            }
-            if (dto.getIsEnabled() != null) {
-                existingUser.setIsEnabled(dto.getIsEnabled());
-            }
-            if (dto.getCompanyBranch() != null) {
-                companyBranch = companyBranchRepository.findById(dto.getCompanyBranch().getId()).get();
-                existingUser.setCompanyBranch(companyBranch);
-            }
-            if (dto.getUpdatedAt() != null) {
-                existingUser.setUpdatedAt(dto.getUpdatedAt());
-            }
-            companyBranch.setName("Ha Noi");
-            log.info("===========================");
-            companyBranch.addUser(existingUser);
-            log.info("============ Save company branch ===============");
-//            companyBranchRepository.save(companyBranch);
-//            userRepository.save(existingUser);
-            log.info("Updated data at cache.");
-            return EmployeeMapper.INSTANCE.toDto(existingUser);
+            existingUser.setFullName(dto.getFullName());
+            existingUser.setUsername(dto.getUsername());
+            existingUser.setAvatarUrl(dto.getAvatarUrl());
+            userRepository.save(existingUser);
         }
         return null;
     }
