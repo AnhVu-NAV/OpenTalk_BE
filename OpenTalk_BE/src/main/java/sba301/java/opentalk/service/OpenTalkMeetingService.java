@@ -2,6 +2,7 @@ package sba301.java.opentalk.service;
 
 import org.springframework.data.domain.Page;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
+import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.dto.OpenTalkMeetingDetailDTO;
 import sba301.java.opentalk.entity.OpenTalkMeeting;
 import sba301.java.opentalk.enums.MeetingStatus;
@@ -19,7 +20,6 @@ public interface OpenTalkMeetingService {
     OpenTalkMeetingDTO updateMeeting(OpenTalkMeetingDTO topic, Long topicId);
 
     Page<OpenTalkMeetingDTO> getAllMeetings(String name, Long companyBranchId, MeetingStatus status, String dateStr, String fromDateStr, String toDateStr, int page, int size);
-
     List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetails(String meetingName, Long branchId);
 
     List<OpenTalkMeetingDetailDTO> getOpenTalkMeetingWithDetailsForHost(String meetingName, Long branchId, String username);
