@@ -7,4 +7,6 @@ public interface MailService {
     void sendMail(Mail mail);
 
     void sendMailUpdateInfoMeetingForMeetingManager(OpenTalkMeetingDTO openTalkMeetingDTO);
+
+    void sendPasswordResetMail(String email, String token);
 }

@@ -326,6 +326,20 @@ public class UserServiceImpl implements UserService {
         return hrDashboardDTO;
     }
 
+    @Override
+    public boolean checkIfEmailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public void updatePassword(String email, String password) throws AppException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
     private Map<String, Integer> getBranchMeetingStats(int year) {
         List<OpenTalkMeeting> allMeetings = openTalkMeetingRepository.findAll();
 
