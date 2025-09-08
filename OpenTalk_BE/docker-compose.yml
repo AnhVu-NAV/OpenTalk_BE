@@ -1,0 +1,65 @@
+services:
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-opentalk}
+      MYSQL_USER: ${MYSQL_USER:-opentalk}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3336:3306"         # mở ra host cho bạn dùng Workbench; có thể bỏ trên prod
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} | grep 'mysqld is alive'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks: [app-net]
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    command: ["redis-server","--appendonly","yes"]
+    volumes:
+      - redis_data:/data
+    # ports:
+    #   - "6379:6379"       # chỉ mở khi cần truy cập từ máy host
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    networks: [app-net]
+
+  app:
+    image: demo-spring:0.0.1     # hoặc dùng: build: .
+    container_name: opentalk-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-opentalk}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-123}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      # Tuỳ chọn:
+      # SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    restart: on-failure:2
+    networks: [app-net]
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  app-net:
+    driver: bridge

@@ -20,6 +20,7 @@ public class CheckPollStatus implements Job {
         List<PollDTO> listPoll = pollService.getAll();
         for (PollDTO poll : listPoll) {
             pollService.updatePollStatus(poll);
+            System.out.println("heheheheheheh");
         }
     }
 }

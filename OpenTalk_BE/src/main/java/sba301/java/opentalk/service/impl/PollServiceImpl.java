@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sba301.java.opentalk.dto.OpenTalkMeetingDTO;
 import sba301.java.opentalk.dto.PollDTO;
-import sba301.java.opentalk.entity.OpenTalkMeeting;
-import sba301.java.opentalk.entity.Poll;
-import sba301.java.opentalk.entity.TopicPoll;
-import sba301.java.opentalk.entity.TopicVote;
+import sba301.java.opentalk.entity.*;
 import sba301.java.opentalk.enums.MeetingStatus;
 import sba301.java.opentalk.mapper.OpenTalkMeetingMapper;
 import sba301.java.opentalk.mapper.PollMapper;
@@ -57,7 +54,7 @@ public class PollServiceImpl implements PollService {
     @Override
     public void updatePollStatus(PollDTO pollDTO) {
         OpenTalkMeetingDTO openTalkMeetingDTO = pollDTO.getOpenTalkMeeting();
-        if (pollDTO.isEnabled() && MeetingStatus.WAITING_TOPIC.equals(openTalkMeetingDTO.getStatus()) &&
+        if (MeetingStatus.WAITING_TOPIC.equals(openTalkMeetingDTO.getStatus()) &&
                 LocalDateTime.now().isAfter(openTalkMeetingDTO.getScheduledDate().minusDays(2))) {
             Poll poll = PollMapper.INSTANCE.toEntity(pollDTO);
             List<TopicPoll> listTopicPoll = topicPollRepository.findByPollId(poll.getId());
@@ -70,10 +67,14 @@ public class PollServiceImpl implements PollService {
                     Map.Entry.comparingByValue()
             );
             TopicPoll topicPoll = maxEntry.getKey();
+            Topic topic = topicPoll.getTopic();
+            long id = topicPoll.getId();
+            long opId = openTalkMeetingDTO.getId();
             openTalkMeetingDTO.setTopic(TopicMapper.INSTANCE.toDto(topicPoll.getTopic()));
             openTalkMeetingDTO.setStatus(MeetingStatus.WAITING_HOST_REGISTER);
             poll.setEnabled(false);
             poll.setOpenTalkMeeting(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
+            openTalkMeetingRepository.save(OpenTalkMeetingMapper.INSTANCE.toEntity(openTalkMeetingDTO));
             pollRepository.save(poll);
         }
     }
